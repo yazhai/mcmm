@@ -26,6 +26,9 @@ class Levy:
         result = term1 + term2 + term3
 
         return result
+    
+    def get_default_domain(self) -> np.ndarray:
+        return np.array([[-10, 10]] * self.dims)
 
 
 class Ackley:
@@ -46,6 +49,9 @@ class Ackley:
         result = term1 + term2 + self.a + jnp.exp(1)
 
         return result
+    
+    def get_default_domain(self) -> np.ndarray:
+        return np.array([[-32.768, 32.768]] * self.dims)
 
 
 class Dropwave:
@@ -64,6 +70,9 @@ class Dropwave:
         result = -term1 / term2
 
         return result
+    
+    def get_default_domain(self) -> np.ndarray:
+        return np.array([[-5.12, 5.12]] * self.dims)
 
 
 class SumSquare:
@@ -80,6 +89,9 @@ class SumSquare:
         result = jnp.sum(coef * (x**2))
 
         return result
+    
+    def get_default_domain(self) -> np.ndarray:
+        return np.array([[-10, 10]] * self.dims)
 
 
 class Easom:
@@ -93,6 +105,9 @@ class Easom:
 
         result = -jnp.prod(jnp.cos(x)) * jnp.exp(-jnp.sum((x - np.pi) ** 2))
         return result
+    
+    def get_default_domain(self) -> np.ndarray:
+        return np.array([[-100, 100]] * self.dims)
 
 
 class Michalewicz:
@@ -111,3 +126,6 @@ class Michalewicz:
 
         result = -jnp.sum(sin_term * m_term)
         return result
+
+    def get_default_domain(self) -> np.ndarray:
+        return np.array([[0, np.pi]] * self.dims)
