@@ -9,7 +9,7 @@ import jax.numpy as jnp
 # from jax import device_put, grad, jit, random, vmap
 from jax import grad as jax_grad
 
-from .node import RealVectorTreeNode
+from src.node import RealVectorTreeNode
 
 
 class MCMM:
@@ -20,7 +20,7 @@ class MCMM:
         ub,
         root=None,
         log="./log.dat",
-        verbose=True,  # Print run-time information
+        verbose=0,  # Run-time information level, 0: no info, 1: summary, 2: run time info, 3: entire tree info
         batch_size=1,  # Number of function evaluations at the same time
         max_iterations=10,  # Number of total iterations
         n_eval_local=10,  # Number of allowed function calls in local opt in every iteration
@@ -90,7 +90,7 @@ class MCMM:
         self.create_root()
 
         for tt in range(self.max_iterations):
-            if self.verbose:
+            if self.verbose >= 1:
                 print(f"Running iteration: {tt+1} ...\n")
 
             # selection and expansion
@@ -102,8 +102,10 @@ class MCMM:
             # back propagation
             self.backprop(node, x_best, y_best)
 
-            if self.verbose:
+            # Information
+            if self.verbose >= 1:
                 print(f"  Best found value until iteration {tt+1} is: {self.root.y} \n")
+            if self.verbose >= 3:
                 self.print()
         return self.root.y
 
@@ -118,17 +120,17 @@ class MCMM:
             node = self.root
 
         while node.children:
-            if self.verbose:
+            if self.verbose >= 2:
                 print(f"  Selecting best child for node : {node.identifier}")
 
             # choose best child by uct
             ucts = self.get_ucts(node)
             if node.visit > self.min_node_visit:  # at least visit by some times
                 uct_explore = self.get_uct_explore(node)  # check branch exploration
-                if self.verbose:
+                if self.verbose >= 2:
                     print(f"    Checking explore term: {uct_explore}")
                 if uct_explore > max(ucts):
-                    if self.verbose:
+                    if self.verbose >= 2:
                         print(
                             f"  Selected: new exploration node is created at branch {node.identifier}"
                         )
@@ -136,7 +138,7 @@ class MCMM:
             idx = np.argmax(ucts)
             node = node.children[idx]
 
-            if self.verbose:
+            if self.verbose >= 2:
                 print(f"  Selected: existing child node {node.identifier}")
 
         # # check leaf exploration
@@ -203,7 +205,7 @@ class MCMM:
         child.identifier = parent_identifier + "_" + str(len(node.children))
         child.set_parent(node)
 
-        if self.verbose:
+        if self.verbose >= 2:
             print(f"  Expanded: new child node {child.identifier} is created. \n")
 
         return child
@@ -298,7 +300,7 @@ class MCMM:
             uct += np.sqrt(np.log(visit_parent) / visit) * self.node_uct_explore
             ucts.append(uct)
 
-            if self.verbose:
+            if self.verbose >= 2:
                 print(
                     f"    Child {child.identifier}: score = {child.score}, num_visit = {child.visit}",
                 )
@@ -388,10 +390,10 @@ class MCMM:
     def print(self):
         nodes = [self.root]
 
+        print("Display entire tree info : node, best_y, num_visits, improves")
         while nodes:
             node = nodes.pop(0)
             print(
-                "  Display node|best_y|num_visits|improves :",
                 node.identifier,
                 node.y,
                 node.visit,
