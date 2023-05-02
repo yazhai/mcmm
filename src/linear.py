@@ -16,9 +16,21 @@ def constraint(a, *args):
     return y - x.dot(a)
 
 
-def quadra_lb(x, y):
-    # find A, such that x.dot(A).dot(x) < y
-    # A is a diagonal matrix
+def max_linear_weight(x, y):
+    """
+    Maximize the weights A with objective function sum(A**2),
+    by the constraint x.dot(A) <= y and A >= 0
+
+    Parameters
+    ----------
+    x : np.ndarray, shape (n_samples, n_features)
+    y : np.ndarray, shape (n_samples,)
+
+    Returns
+    -------
+    A : np.ndarray, shape (n_features,)
+    """
+
     assert isinstance(x, np.ndarray) and isinstance(y, np.ndarray)
     assert x.ndim == 2
 
