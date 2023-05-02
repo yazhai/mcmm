@@ -1,0 +1,42 @@
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo brute --seed 0 --output_dir baseline_results_50_dims/ --timeout 300'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo brute --seed 0 --output_dir baseline_results_50_dims/ --timeout 300
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_50_dims/ --timeout 300'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_50_dims/ --timeout 300
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_50_dims/ --timeout 300'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_50_dims/ --timeout 300
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo shgo --seed 0 --output_dir baseline_results_50_dims/ --timeout 300'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo shgo --seed 0 --output_dir baseline_results_50_dims/ --timeout 300
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo dual_annealing --seed 0 --output_dir baseline_results_50_dims/ --timeout 300'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo dual_annealing --seed 0 --output_dir baseline_results_50_dims/ --timeout 300
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo direct --seed 0 --output_dir baseline_results_50_dims/ --timeout 300'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo direct --seed 0 --output_dir baseline_results_50_dims/ --timeout 300
+echo 'python run_baseline.py --func Levy --dims 50 --solver gurobi --algo none --seed 0 --output_dir baseline_results_50_dims/ --timeout 300'
+python run_baseline.py --func Levy --dims 50 --solver gurobi --algo none --seed 0 --output_dir baseline_results_50_dims/ --timeout 300
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo brute --seed 0 --output_dir baseline_results_50_dims/ --timeout 300'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo brute --seed 0 --output_dir baseline_results_50_dims/ --timeout 300
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_50_dims/ --timeout 300'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_50_dims/ --timeout 300
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_50_dims/ --timeout 300'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_50_dims/ --timeout 300
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo shgo --seed 0 --output_dir baseline_results_50_dims/ --timeout 300'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo shgo --seed 0 --output_dir baseline_results_50_dims/ --timeout 300
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo dual_annealing --seed 0 --output_dir baseline_results_50_dims/ --timeout 300'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo dual_annealing --seed 0 --output_dir baseline_results_50_dims/ --timeout 300
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo direct --seed 0 --output_dir baseline_results_50_dims/ --timeout 300'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo direct --seed 0 --output_dir baseline_results_50_dims/ --timeout 300
+echo 'python run_baseline.py --func Ackley --dims 50 --solver gurobi --algo none --seed 0 --output_dir baseline_results_50_dims/ --timeout 300'
+python run_baseline.py --func Ackley --dims 50 --solver gurobi --algo none --seed 0 --output_dir baseline_results_50_dims/ --timeout 300
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo brute --seed 0 --output_dir baseline_results_50_dims/ --timeout 300'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo brute --seed 0 --output_dir baseline_results_50_dims/ --timeout 300
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_50_dims/ --timeout 300'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_50_dims/ --timeout 300
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_50_dims/ --timeout 300'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_50_dims/ --timeout 300
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo shgo --seed 0 --output_dir baseline_results_50_dims/ --timeout 300'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo shgo --seed 0 --output_dir baseline_results_50_dims/ --timeout 300
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo dual_annealing --seed 0 --output_dir baseline_results_50_dims/ --timeout 300'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo dual_annealing --seed 0 --output_dir baseline_results_50_dims/ --timeout 300
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo direct --seed 0 --output_dir baseline_results_50_dims/ --timeout 300'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo direct --seed 0 --output_dir baseline_results_50_dims/ --timeout 300
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver gurobi --algo none --seed 0 --output_dir baseline_results_50_dims/ --timeout 300'
+python run_baseline.py --func Michalewicz --dims 50 --solver gurobi --algo none --seed 0 --output_dir baseline_results_50_dims/ --timeout 300

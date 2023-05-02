@@ -73,6 +73,7 @@ try:
         print('%s %g' % (v.VarName, v.X))
 
     print('Obj: %g' % m.ObjVal)
+    print('Runtime: %g' % m.Runtime)
 
 except gp.GurobiError as e:
     print('Error code ' + str(e.errno) + ': ' + str(e))
