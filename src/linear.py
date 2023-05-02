@@ -44,7 +44,7 @@ def max_linear_weight(x, y):
         constraints={"type": "ineq", "fun": constraint, "args": (x, y)},
         bounds=bounds,  # lb/ub box
         method="SLSQP",
-        options={"disp": True},
+        options={"disp": False},
     )
 
     return res.x

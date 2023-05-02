@@ -9,7 +9,11 @@ import jax.numpy as jnp
 # from jax import device_put, grad, jit, random, vmap
 from jax import grad as jax_grad
 
+from pyibex import Interval, IntervalVector
+
 from src.node import RealVectorTreeNode
+from src.linear import max_linear_weight
+from src.expression_operation import *
 
 
 class MCMM:
@@ -34,6 +38,8 @@ class MCMM:
         leaf_improve=100.0,  # C_d'' for leaf
         leaf_explore=10.0,  # C_p'' for leaf
         branch_explore=1.0,  # C_p' for branch
+        function_variables=None,  # symbolic variables of the function
+        function_expression=None,  # symbolic expression of the function
         **kwargs,
     ):
         self.fn = fn
@@ -42,9 +48,12 @@ class MCMM:
         self.log = log
         self.dims = len(lb)
 
+        # root is initialized to the anchor
+        # if anchor is provided
+        self.root_anchor = root
         self.root = None
-        self.verbose = verbose
 
+        self.verbose = verbose
         self.if_save_history = True
         self.history_cache = 1000
         self._history = np.zeros((self.history_cache, 1 + self.dims))
@@ -81,13 +90,19 @@ class MCMM:
         self.branch_explore = branch_explore  # C_d' for branch
         self.min_node_visit = 1  # minimum number of visits before expand
 
+        # Symbolic expression of the function
+        self.function_variables = function_variables
+        self.function_expression = function_expression
+
+        # Update other parameters
+        self._box_init = None
         self.set_parameters(**kwargs)
 
         return
 
     def optimize(self, **kwargs):
         self.set_parameters(**kwargs)
-        self.create_root()
+        self.create_root(self.root_anchor)
 
         for tt in range(self.max_iterations):
             if self.verbose >= 1:
@@ -115,7 +130,34 @@ class MCMM:
                 setattr(self, key, val)
         return
 
-    def select(self, node=None):
+    def select(self):
+        # if the last 5 improves are less than 1e-5,
+        # then try to find a box
+        if len(self.root.improves) <= 5:
+            return self.mctd_select()
+
+        if np.sum(self.root.improves[-5:]) > 1e-5:
+            return self.mctd_select()
+
+        # find a box
+        box = self.suggest_box()
+        if box is None:
+            return self.mctd_select()
+
+        # create a new node with the box
+        _lb, _ub = self._box_to_list(box)
+        _lb = np.array(_lb)
+        _ub = np.array(_ub)
+        anchor = self.uniform_sample(_lb, _ub)
+        node = self.create_node(anchor)
+
+        # add the node to the root node
+        parent = self.root
+        node.set_parent(parent)
+        node.identifier = parent.identifier + "_" + str(len(parent.children))
+        return node
+
+    def mctd_select(self, node=None):
         if node is None:
             node = self.root
 
@@ -346,9 +388,13 @@ class MCMM:
         )
         return node
 
-    def uniform_sample(self):
+    def uniform_sample(self, lb=None, ub=None):
+        if lb is None:
+            lb = self.lb
+        if ub is None:
+            ub = self.ub
         ratio = self._cache_rand()
-        sample = self.lb + (self.ub - self.lb) * ratio
+        sample = lb + (ub - lb) * ratio
         return sample
 
     def _cache_rand(self, cache_size=1000):
@@ -406,3 +452,88 @@ class MCMM:
     @property
     def history(self):
         return self._history[: self.history_current_idx + 1, :]
+
+    def _quadra_lb(self, X, y):
+        # Get best point
+        idx_best = np.argmin(y)
+        y_best = y[idx_best]
+        x_best = X[idx_best]
+
+        # Learn a quadratic lower bound function based on X/y:
+        # lb = k * (x - x_best)**2 + y_best <= y
+        # where k is a non-negative constant
+        # The above form is equivalent to:
+        # x2 * k <= y1
+        # in which x2 = (x - x_best)**2, y1 = y - y_best
+        x2 = (X - x_best) ** 2
+        y1 = y - y_best
+        quadra_coeff = max_linear_weight(x2, y1)
+
+        # Make the coefficient under-approximation
+        # to guarantee the lower bound is always below the true function
+        quadra_coeff *= 0.5
+
+        # Update the lower bound function
+        variables, expression = expression_quadratic(x_best, quadra_coeff, y_best)
+
+        if self.verbose >= 2:
+            print(" Quadra LB:", x_best, quadra_coeff, y_best)
+            print("Expression:", expression)
+
+        return variables, expression
+
+    def history_lower_bound(self):
+        # Get history
+        X = self.history[:, 1:]
+        y = self.history[:, 0]
+
+        # Get lower bound
+        if self.verbose >= 2:
+            print("  Finding lower bound function...")
+        self.lb_variables, self.lb_expression = self._quadra_lb(X, y)
+        return
+
+    def suggest_box(self):
+        """
+        Suggest a box that is likely to have a point where the current lb function equals the objective function.
+        """
+        if self.function_expression is None:
+            print("No function expression is provided. Cannot suggest box.")
+            return None
+
+        # Get the lower bound function
+        self.history_lower_bound()
+
+        # Get the equality relationship
+        assert self.lb_variables == self.function_variables
+        expression_equality = expression_minus(
+            self.function_expression, self.lb_expression
+        )
+
+        # Initial box is the entire space
+        if self._box_init is None:
+            intervals = []
+            for i in range(len(self.lb)):
+                _int = [self.lb[i], self.ub[i]]
+                intervals.append(_int)
+            self._box_init = IntervalVector(intervals)
+        if self.verbose >= 2:
+            print("  Suggesting box with initial box...")
+        suggest_box = root_box(
+            self.lb_variables,
+            expression_equality,
+            self._box_init,
+        )
+
+        if self.verbose >= 2:
+            print("Suggested box:", suggest_box)
+
+        return suggest_box
+
+    def _box_to_list(self, box):
+        lb = []
+        ub = []
+        for intv in box:
+            lb.append(intv[0])
+            ub.append(intv[1])
+        return lb, ub
