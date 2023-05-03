@@ -11,9 +11,9 @@ from jax import grad as jax_grad
 
 from pyibex import Interval, IntervalVector
 
-from src.node import RealVectorTreeNode
-from src.linear import max_linear_weight
-from src.expression_operation import *
+from .node import RealVectorTreeNode
+from .linear import max_linear_weight
+from .expression_operation import *
 
 
 class MCMM:

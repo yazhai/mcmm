@@ -2,6 +2,26 @@ import numpy as np
 import jax.numpy as jnp
 
 
+class ToyObjective:
+    def __init__(self, dims: int = 2) -> None:
+        self.dims = dims  #
+        return
+
+    def __call__(self, x: np.ndarray) -> float:
+        assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
+        assert x.ndim == 1
+
+        term1 = 1000 * jnp.sum(jnp.square((x + 1))) - 3
+        term2 = jnp.sum(jnp.square(x - 1)) - 1
+
+        result = jnp.minimum(term1, term2)
+
+        return result
+
+    def get_default_domain(self) -> np.ndarray:
+        return np.array([[-3, 3]] * self.dims)
+
+
 class Levy:
     def __init__(self, dims: int = 2) -> None:
         self.dims = dims  #
@@ -26,7 +46,7 @@ class Levy:
         result = term1 + term2 + term3
 
         return result
-    
+
     def get_default_domain(self) -> np.ndarray:
         return np.array([[-10, 10]] * self.dims)
 
@@ -49,7 +69,7 @@ class Ackley:
         result = term1 + term2 + self.a + jnp.exp(1)
 
         return result
-    
+
     def get_default_domain(self) -> np.ndarray:
         return np.array([[-32.768, 32.768]] * self.dims)
 
@@ -70,7 +90,7 @@ class Dropwave:
         result = -term1 / term2
 
         return result
-    
+
     def get_default_domain(self) -> np.ndarray:
         return np.array([[-5.12, 5.12]] * self.dims)
 
@@ -89,7 +109,7 @@ class SumSquare:
         result = jnp.sum(coef * (x**2))
 
         return result
-    
+
     def get_default_domain(self) -> np.ndarray:
         return np.array([[-10, 10]] * self.dims)
 
@@ -105,7 +125,7 @@ class Easom:
 
         result = -jnp.prod(jnp.cos(x)) * jnp.exp(-jnp.sum((x - np.pi) ** 2))
         return result
-    
+
     def get_default_domain(self) -> np.ndarray:
         return np.array([[-100, 100]] * self.dims)
 

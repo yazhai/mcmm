@@ -20,6 +20,25 @@ class TestFunction:
         raise NotImplementedError
 
 
+class ToyObjective(TestFunction):
+    def __init__(self, dims: int = 2) -> None:
+        super().__init__(dims)
+
+    def __call__(self, x: np.ndarray) -> float:
+        assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
+        assert x.ndim == 1
+
+        term1 = 1000 * jnp.sum(jnp.square((x + 1))) - 3
+        term2 = jnp.sum(jnp.square(x - 1)) - 1
+
+        result = jnp.minimum(term1, term2)
+
+        return result
+
+    def get_default_domain(self) -> np.ndarray:
+        return np.array([[-3, 3]] * self.dims)
+
+
 class Levy(TestFunction):
     def __init__(self, dims: int = 2) -> None:
         super().__init__(dims)
@@ -28,7 +47,9 @@ class Levy(TestFunction):
         assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
         assert x.ndim == 1
 
-        w = 1 + (x - 1) / 4
+        displacement = np.arange(x.shape[0]) + 1.23456
+
+        w = 1 + (x - displacement) / 4
 
         # sin(pi*w0)**2
         term1 = (jnp.sin(jnp.pi * w[0])) ** 2
