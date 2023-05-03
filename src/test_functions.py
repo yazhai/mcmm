@@ -2,10 +2,23 @@ import numpy as np
 import jax.numpy as jnp
 
 
-class ToyObjective:
+class TestFunction:
     def __init__(self, dims: int = 2) -> None:
         self.dims = dims  #
-        return
+
+    def __call__(self, x: np.ndarray) -> float:
+        raise NotImplementedError
+
+    def get_default_domain(self) -> np.ndarray:
+        raise NotImplementedError
+
+    def expression(self):
+        raise NotImplementedError
+
+
+class ToyObjective(TestFunction):
+    def __init__(self, dims: int = 2) -> None:
+        super().__init__(dims)
 
     def __call__(self, x: np.ndarray) -> float:
         assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
@@ -21,11 +34,28 @@ class ToyObjective:
     def get_default_domain(self) -> np.ndarray:
         return np.array([[-3, 3]] * self.dims)
 
+    def expression(self) -> str:
+        dims = self.dims
+        variables = [f"x[{dims}]"]
+        x_minus_1 = [f"((x[{i}] - 1)^2 )" for i in range(dims)]
+        x_plus_1 = [f"((x[{i}] + 1)^2 )" for i in range(dims)]
 
-class Levy:
+        # write the expression for levy function
+        expression_1 = "-3"
+        expression_2 = "-1"
+
+        for i in range(dims):
+            expression_1 += f" + 1000 * {x_minus_1[i]}"
+            expression_2 += f" + {x_plus_1[i]}"
+
+        expression = f"min(({expression_1}), ({expression_2}))"
+
+        return variables, expression
+
+
+class Levy(TestFunction):
     def __init__(self, dims: int = 2) -> None:
-        self.dims = dims  #
-        return
+        super().__init__(dims)
 
     def __call__(self, x: np.ndarray) -> float:
         assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
@@ -50,10 +80,33 @@ class Levy:
     def get_default_domain(self) -> np.ndarray:
         return np.array([[-10, 10]] * self.dims)
 
+    def expression(self) -> str:
+        """
+        Return the levy function expression in string format
 
-class Ackley:
+        return:
+        variables in the levy function, list of str
+        expression of the levy function, str
+        """
+
+        dims = self.dims
+        variables = [f"x[{dims}]"]
+        w = [f"(1 + (x[{i}] - 1) / 4)" for i in range(dims)]
+
+        # write the expression for levy function
+        expression = f"sin(pi * {w[0]})^2"
+
+        for i in range(dims - 1):
+            expression += f"+ ({w[i]}-1) ^2 * (1 + 10 * sin(pi * {w[i]} + 1)^2) "
+
+        expression += f"+ ({w[-1]}-1)^2 * (1 + sin(2 * pi * {w[-1]})^2)"
+
+        return variables, expression
+
+
+class Ackley(TestFunction):
     def __init__(self, dims: int = 2) -> None:
-        self.dims = dims
+        super().__init__(dims)
         self.a = 20
         self.b = 0.2
         self.c = 2 * np.pi
@@ -74,9 +127,9 @@ class Ackley:
         return np.array([[-32.768, 32.768]] * self.dims)
 
 
-class Dropwave:
+class Dropwave(TestFunction):
     def __init__(self, dims: int = 2) -> None:
-        self.dims = 2  # only 2D
+        super().__init__(2)  # only 2D
 
     def __call__(self, x: np.ndarray) -> float:
         assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
@@ -95,9 +148,9 @@ class Dropwave:
         return np.array([[-5.12, 5.12]] * self.dims)
 
 
-class SumSquare:
+class SumSquare(TestFunction):
     def __init__(self, dims: int = 2) -> None:
-        self.dims = dims
+        super().__init__(dims)
 
     def __call__(self, x: np.ndarray) -> float:
         assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
@@ -114,9 +167,9 @@ class SumSquare:
         return np.array([[-10, 10]] * self.dims)
 
 
-class Easom:
+class Easom(TestFunction):
     def __init__(self, dims: int = 2) -> None:
-        self.dims = 2
+        super().__init__(dims)
 
     def __call__(self, x: np.ndarray) -> float:
         assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
@@ -130,9 +183,9 @@ class Easom:
         return np.array([[-100, 100]] * self.dims)
 
 
-class Michalewicz:
+class Michalewicz(TestFunction):
     def __init__(self, dims: int = 2, m: float = 10.0) -> None:
-        self.dims = dims
+        super().__init__(dims)
         self.m = m
 
     def __call__(self, x: np.ndarray) -> float:

@@ -1,9 +1,17 @@
-import numpy as np
-import jax.numpy as jnp
-import gurobipy as gp
-from gurobipy import GRB
-
 from typing import List
+import numpy as np
+
+
+try:
+    import jax.numpy as jnp
+except ModuleNotFoundError:
+    print("Importing error: JAX not found.")
+
+try:
+    import gurobipy as gp
+    from gurobipy import GRB
+except ModuleNotFoundError:
+    print("Importing error: Gurobi not found.")
 
 
 class TestFunction:
@@ -17,6 +25,9 @@ class TestFunction:
         raise NotImplementedError
 
     def encode_to_gurobi(self, m: gp.Model = None, x: List[gp.Var] = None):
+        raise NotImplementedError
+
+    def expression(self):
         raise NotImplementedError
 
 
@@ -37,6 +48,24 @@ class ToyObjective(TestFunction):
 
     def get_default_domain(self) -> np.ndarray:
         return np.array([[-3, 3]] * self.dims)
+
+    def expression(self) -> str:
+        dims = self.dims
+        variables = [f"x[{dims}]"]
+        x_minus_1 = [f"((x[{i}] - 1)^2 )" for i in range(dims)]
+        x_plus_1 = [f"((x[{i}] + 1)^2 )" for i in range(dims)]
+
+        # write the expression for levy function
+        expression_1 = "-3"
+        expression_2 = "-1"
+
+        for i in range(dims):
+            expression_1 += f" + 1000 * {x_minus_1[i]}"
+            expression_2 += f" + {x_plus_1[i]}"
+
+        expression = f"min(({expression_1}), ({expression_2}))"
+
+        return variables, expression
 
 
 class Levy(TestFunction):
@@ -148,6 +177,29 @@ class Levy(TestFunction):
         m.params.NonConvex = 2
 
         return m
+
+    def expression(self) -> str:
+        """
+        Return the levy function expression in string format
+
+        return:
+        variables in the levy function, list of str
+        expression of the levy function, str
+        """
+
+        dims = self.dims
+        variables = [f"x[{dims}]"]
+        w = [f"(1 + (x[{i}] - 1) / 4)" for i in range(dims)]
+
+        # write the expression for levy function
+        expression = f"sin(pi * {w[0]})^2"
+
+        for i in range(dims - 1):
+            expression += f"+ ({w[i]}-1) ^2 * (1 + 10 * sin(pi * {w[i]} + 1)^2) "
+
+        expression += f"+ ({w[-1]}-1)^2 * (1 + sin(2 * pi * {w[-1]})^2)"
+
+        return variables, expression
 
 
 class Ackley(TestFunction):
