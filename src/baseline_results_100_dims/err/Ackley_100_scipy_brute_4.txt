@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/home/zhizhen/Documents/mcmm/src/run_baseline.py", line 117, in <module>
+    result_dict = runner.run()
+  File "/home/zhizhen/Documents/mcmm/src/baselines/scipy_baseline/scipy_baseline.py", line 59, in run
+    scipy_result = self.run_scipy_optimization(
+  File "/home/zhizhen/Documents/mcmm/src/baselines/scipy_baseline/scipy_baseline.py", line 113, in run_scipy_optimization
+    result = opt.brute(func, bounds, full_output=True)
+  File "/home/zhizhen/anaconda3/envs/mcmm/lib/python3.9/site-packages/scipy/optimize/_optimize.py", line 3631, in brute
+    raise ValueError("Brute Force not possible with more "
+ValueError: Brute Force not possible with more than 40 variables.

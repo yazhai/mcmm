@@ -238,15 +238,22 @@ class ScipyBaselineRunner(BaselineRunner):
         elif algo == "direct":
 
             class MinimizeStopperDirect(object):
-                def __init__(self, timeout=float("inf")):
+                def __init__(self, timeout=float("inf"), func=None):
                     self.timeout = timeout
                     self.start = time.time()
                     self.best_x = None
                     self.best_obj = float("inf")
                     self.timeout_reached = False
+                    self.func = func
 
-                def __call__(self, x, f, context):
+                def __call__(self, xk):
                     elapsed = time.time() - self.start
+                    x = xk
+
+                    if self.func is not None:
+                        f = np.array(self.func(x))
+                    else:
+                        f = float("inf")
 
                     if f < self.best_obj:
                         self.best_x = x
@@ -260,7 +267,8 @@ class ScipyBaselineRunner(BaselineRunner):
             bounds = func.get_default_domain()
             timer_start = time.time()
             callback_instance = MinimizeStopperDirect(timeout=timeout)
-            result = opt.dual_annealing(func, bounds, callback=callback_instance)
+            bounds = [(bounds[i, 0], bounds[i, 1]) for i in range(bounds.shape[0])]
+            result = opt.direct(func, bounds, callback=callback_instance)
             time_elapsed = time.time() - timer_start
             timeout_reached = callback_instance.timeout_reached
         else:

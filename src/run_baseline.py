@@ -57,12 +57,19 @@ parser.add_argument(
     default="output",
     help="The directory to save the output to.",
 )
+parser.add_argument(
+    "--rerun_if_exists",
+    default=False,
+    action="store_true",
+    help="Rerun if output exists.",
+)
 
 
 args = parser.parse_args()
 
 print("Running with args:")
 print(args)
+
 
 def get_output_fname(args):
     if args.solver == "scipy":
@@ -88,10 +95,22 @@ os.makedirs(raw_dir, exist_ok=True)
 err_dir = os.path.join(output_dir, "err")
 os.makedirs(err_dir, exist_ok=True)
 
+res_fp = os.path.join(result_dir, "{}.json".format(get_output_fname(args)))
+raw_fp = os.path.join(raw_dir, "{}.pickle".format(get_output_fname(args)))
+err_fp = os.path.join(err_dir, "{}.txt".format(get_output_fname(args)))
+if any([os.path.exists(fp) for fp in [res_fp, raw_fp]]):
+    if args.rerun_if_exists:
+        print("Output already exists. Rerunning.")
+    else:
+        print("Output already exists. Skipping.")
+        exit(0)
+
 try:
     if args.solver == "scipy":
         assert args.algo != "none", "If solver is scipy, then algo must be specified."
-        runner = ScipyBaselineRunner(args.func, args.dims, args.algo, timeout=args.timeout)
+        runner = ScipyBaselineRunner(
+            args.func, args.dims, args.algo, timeout=args.timeout
+        )
     elif args.solver == "gurobi":
         runner = GurobiBaselineRunner(args.func, args.dims, args.algo)
 
@@ -103,7 +122,7 @@ try:
 
     filename_result = "{}.json".format(get_output_fname(args))
     with open(os.path.join(result_dir, filename_result), "w") as f:
-        del result_dict['raw_output']
+        del result_dict["raw_output"]
         # result_dict['x'] = result_dict['x'].tolist()
         json.dump(result_dict, f)
 
@@ -113,5 +132,3 @@ except Exception as e:
     filename_err = "{}.txt".format(get_output_fname(args))
     with open(os.path.join(err_dir, filename_err), "w") as f:
         f.write(stack_trace)
-
-

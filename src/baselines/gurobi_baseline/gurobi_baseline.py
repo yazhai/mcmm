@@ -39,18 +39,24 @@ class GurobiBaselineRunner(BaselineRunner):
         else:
             raise NotImplementedError
 
-        self.model = gp.Model(self.algorithm)
+        self.model = gp.Model(self.function_name)
         self.x = []
+        bounds = self.func.get_default_domain()
         for i in range(dimensions):
-            self.x.append(self.model.addVar(vtype=GRB.CONTINUOUS, name="x" + str(i)))
+            self.x.append(
+                self.model.addVar(
+                    lb=bounds[i][0],
+                    ub=bounds[i][1],
+                    vtype=GRB.CONTINUOUS,
+                    name="x" + str(i),
+                )
+            )
 
         self.model = self.func.encode_to_gurobi(self.model, self.x)
 
-        bounds = self.func.get_default_domain()
-        for i in range(dimensions):
-            self.model.addConstr(self.x[i] >= bounds[i][0], name="x" + str(i) + "lower")
-            self.model.addConstr(self.x[i] <= bounds[i][1], name="x" + str(i) + "upper")
-
+        # for i in range(dimensions):
+        #     self.model.addConstr(self.x[i] >= bounds[i][0], name="x" + str(i) + "lower")
+        #     self.model.addConstr(self.x[i] <= bounds[i][1], name="x" + str(i) + "upper")
 
     def run(self) -> dict:
         import io
@@ -60,19 +66,21 @@ class GurobiBaselineRunner(BaselineRunner):
             self.model.optimize()
             console_output = buf.getvalue()
 
-        result_dict = GurobiBaselineRunner.process_gurobi_result(self.model, self.x, console_output=console_output)
+        result_dict = GurobiBaselineRunner.process_gurobi_result(
+            self.model, self.x, console_output=console_output
+        )
         return result_dict
 
     @staticmethod
-    def process_gurobi_result(model, variables, console_output='') -> dict:
+    def process_gurobi_result(model, variables, console_output="") -> dict:
         x = [v.X for v in variables]
         obj_val = model.ObjVal
         time_elapsed = model.Runtime
-        
+
         raw_output = {}
-        raw_output['model_status'] = model.Status
-        raw_output['MIP_gap'] = model.MIPGap
-        raw_output['console_output'] = console_output
+        raw_output["model_status"] = model.Status
+        raw_output["MIP_gap"] = model.MIPGap
+        raw_output["console_output"] = console_output
 
         result_dict = {
             "x": x,
