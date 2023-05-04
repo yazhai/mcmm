@@ -45,8 +45,8 @@ class ToyObjective(TestFunction):
         expression_2 = "-1"
 
         for i in range(dims):
-            expression_1 += f" + 1000 * {x_minus_1[i]}"
-            expression_2 += f" + {x_plus_1[i]}"
+            expression_1 += f" + 1000 * {x_plus_1[i]}"
+            expression_2 += f" + {x_minus_1[i]}"
 
         expression = f"min(({expression_1}), ({expression_2}))"
 
