@@ -62,8 +62,8 @@ def expression_quadratic(x0: list, k: list, c: float = 0.0) -> str:
     variables = [f"x[{len(x0_list)}]"]
     expression = ""
     for i in range(len(x0_list)):
-        expression += f"{k_list[i]}*(x[{i}] - {x0_list[i]})^2 + "
+        expression += f" {k_list[i]} * (x[{i}] - {x0_list[i]})^2 + "
 
-    expression += str(c)
+    expression += f"({c})"
 
     return variables, expression
