@@ -5,9 +5,11 @@ from scipy.optimize import minimize as scipy_minimize
 
 def objective(x):
     # May be a convex function
-    # Such as a quadratic function
-    # or min of all elements
-    return -np.sum(x**2)
+    # E.g. a quadratic function (note: this is incorrect. Max the sum of x**2 may lead to a large value in one dimension but all others to 0)
+    # return -np.sum(x**2)
+    #
+    # We want to maximize the min of all elements
+    return -np.min(x)
 
 
 def constraint(a, *args):
