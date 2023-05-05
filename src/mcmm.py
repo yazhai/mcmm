@@ -47,17 +47,27 @@ class MCMM:
         self.ub = ub
         self.log = log
         self.dims = len(lb)
+        self.verbose = verbose
 
         # root is initialized to the anchor
         # if anchor is provided
         self.root_anchor = root
         self.root = None
+        # self.root_child_number = int(2 * np.sqrt(self.dims))
+        self.root_child_number = 0
 
-        self.verbose = verbose
+        # Caches for history and node best
+        self._cache_expand_size = 1000
+
+        # history saves the history of all evaluations
         self.if_save_history = True
-        self.history_cache = 1000
-        self._history = np.zeros((self.history_cache, 1 + self.dims))
+        self._history = None
         self.history_current_idx = -1
+
+        # node best saves the best value of each node
+        self.if_save_node_best = True
+        self._node_best = None
+        self.node_best_current_idx = -1
 
         # iterations
         self.max_iterations = max_iterations
@@ -69,8 +79,8 @@ class MCMM:
         self.local_opt_eval_num = n_eval_local
         self.local_opt_eval_time = 10
         self.local_opt_algo = nlopt.LD_CCSAQ
-        self.local_opt_ftol_rel = 1e-6
-        self.local_opt_ftol_abs = 1e-6
+        self.local_opt_ftol_rel = 1e-3
+        self.local_opt_ftol_abs = 1e-3
         self.local_opt_xtol_rel = 1e-6
         self.local_opt_xtol_abs = 1e-6
         self.local_opt = None
@@ -94,15 +104,38 @@ class MCMM:
         self.function_variables = function_variables
         self.function_expression = function_expression
 
+        # Learning the lower bound
+        self.found_empty_box = False
+        self.lb_expression = None
+        self.lb_variables = None
+        self.lb_ignore_min_dist = (
+            1e-4  # ignore points with distance smaller than this value
+        )
+        self.lb_lower_by = 0.1  # lower the lower bound by this value
+        self.lb_ignore_coeff = (
+            1e-4  # ignore points with coefficient smaller than this value
+        )
+
         # Update other parameters
         self._box_init = None
         self.set_parameters(**kwargs)
 
         return
 
-    def optimize(self, **kwargs):
+    def optimize(self, restart=False, **kwargs):
         self.set_parameters(**kwargs)
-        self.create_root(self.root_anchor)
+
+        if not restart:
+            self.root = None
+            if self.if_save_history:
+                self._history = self._cache_expand()
+                self.history_current_idx = -1
+            if self.if_save_node_best:
+                self._node_best = self._cache_expand()
+                self.node_best_current_idx = -1
+
+        if self.root is None:
+            self.create_root(self.root_anchor)
 
         for tt in range(self.max_iterations):
             if self.verbose >= 1:
@@ -110,9 +143,13 @@ class MCMM:
 
             # selection and expansion
             node = self.select()
+            # when suggesting an empty box, stop and return the best found value
+            if self.found_empty_box:
+                return self.root.y
 
             # local optimization
             y_best, x_best = self.optimize_node(node)
+            # save the best value to node best
 
             # back propagation
             self.backprop(node, x_best, y_best)
@@ -139,10 +176,19 @@ class MCMM:
         if np.sum(self.root.improves[-5:]) > 1e-5:
             return self.mctd_select()
 
+        print("Start to find a box ...")
+
         # find a box
         box = self.suggest_box()
         if box is None:
+            print("No box found, continue MCTD ...")
             return self.mctd_select()
+
+        # check if the box contains empty
+        contains_empty = any(Interval.is_empty(inv) for inv in box)
+        if contains_empty:
+            self.found_empty_box = True
+            return self.root
 
         # create a new node with the box
         _lb, _ub = self._box_to_list(box)
@@ -150,6 +196,8 @@ class MCMM:
         _ub = np.array(_ub)
         anchor = self.uniform_sample(_lb, _ub)
         node = self.create_node(anchor)
+        if self.verbose >= 2:
+            print(f"  Create a new node: {node.identifier}, at {anchor}")
 
         # add the node to the root node
         parent = self.root
@@ -300,6 +348,9 @@ class MCMM:
             y_best = node.y
             curr_node = node.parent
 
+        if self.if_save_node_best:
+            self.add_node_best(x_best, y_best)
+
         while curr_node:
             curr_node.update_stat(y_best, x_best)
             curr_node.visit_once()
@@ -322,16 +373,43 @@ class MCMM:
         return y
 
     def add_history(self, x, y):
-        self.history_current_idx += 1
-
-        if self.history_current_idx >= self._history.shape[0]:
-            self._history = np.concatenate(
-                (self._history, np.zeros((self.history_cache, 1 + self.dims))), axis=0
-            )
-
-        self._history[self.history_current_idx, 0] = y
-        self._history[self.history_current_idx, 1:] = x
+        self._add_to_cache(x, y, cache="global")
         return
+
+    def add_node_best(self, x, y):
+        self._add_to_cache(x, y, cache="node")
+        return
+
+    def _add_to_cache(self, x, y, cache="global"):
+        idx = -1
+        if cache == "global":
+            self.history_current_idx += 1
+            if self.history_current_idx >= self._history.shape[0]:
+                self._history = self._cache_expand(self._history)
+            history = self._history
+            idx = self.history_current_idx
+        elif cache == "node":
+            self.node_best_current_idx += 1
+            if self.node_best_current_idx >= self._node_best.shape[0]:
+                self._node_best = self._cache_expand(self._node_best)
+            history = self._node_best
+            idx = self.node_best_current_idx
+        else:
+            raise ValueError("Invalid cache type.")
+
+        history[idx, 0] = y
+        history[idx, 1:] = x
+        return
+
+    def _cache_expand(self, cache_array=None):
+        if cache_array is None:
+            cache_array = np.zeros((self._cache_expand_size, 1 + self.dims))
+        else:
+            cache_array = np.concatenate(
+                (cache_array, np.zeros((self._cache_expand_size, 1 + self.dims))),
+                axis=0,
+            )
+        return cache_array
 
     def get_ucts(self, node):
         ucts = []
@@ -360,10 +438,38 @@ class MCMM:
         return uct_explore
 
     def create_root(self, anchor=None):
-        self.root = self.create_node(anchor)
+        # Single starting node: use root node
+        if self.root_child_number <= 1:
+            self.root = self.create_node(anchor)
+            self.root.is_root = True
+            self.root.set_level()
+            self.root.identifier = "root"
+
+            y_best, X_best = self.optimize_node(self.root)
+            self.backprop(self.root, X_best, y_best)
+            return
+
+        # Multiple starting nodes: use empty node as root
+        # In 0 iteration, do sampling multiple times
+        self.root = self.create_empty_node()
         self.root.is_root = True
         self.root.set_level()
         self.root.identifier = "root"
+
+        child = self.create_node(anchor)
+        child.set_parent(self.root)
+        identifier = f"root_0"
+        child.identifier = identifier
+
+        for ii in range(self.root_child_number - 1):
+            child = self.create_node()
+            child.set_parent(self.root)
+            identifier = f"root_{ii + 1}"
+            child.identifier = identifier
+
+        for child in self.root.children:
+            y_best, X_best = self.optimize_node(child)
+            self.backprop(child, X_best, y_best)
         return
 
     def create_node(self, x_anchor=None, y_anchor=None):
@@ -453,7 +559,27 @@ class MCMM:
     def history(self):
         return self._history[: self.history_current_idx + 1, :]
 
+    @property
+    def node_best(self):
+        return self._node_best[: self.node_best_current_idx + 1, :]
+
+    def _box_to_list(self, box):
+        lb = []
+        ub = []
+        for intv in box:
+            lb.append(intv[0])
+            ub.append(intv[1])
+        return lb, ub
+
     def _quadra_lb(self, X, y):
+        """
+        Compute a quadratic lower bound function for the given data
+
+        Return:
+            variables: a list of variables
+            expression: a sympy expression
+        """
+
         # Get best point
         idx_best = np.argmin(y)
         y_best = y[idx_best]
@@ -474,24 +600,102 @@ class MCMM:
         quadra_coeff *= 0.5
 
         # Update the lower bound function
-        variables, expression = expression_quadratic(x_best, quadra_coeff, y_best)
+        variables, expression = expression_quadratic(
+            x_best, quadra_coeff, y_best, self.lb_ignore_coeff
+        )
 
         if self.verbose >= 2:
-            print(" Quadra LB:", x_best, quadra_coeff, y_best)
-            print("Expression:", expression)
-
+            print(" Quadra LB center:", x_best)
+            print(" Quadra LB coefficients:", quadra_coeff)
         return variables, expression
 
-    def history_lower_bound(self):
+    def _distance(self, x1, x2=None):
+        if x2 is None:
+            x2 = x1
+
+        x12 = np.linalg.norm(x1, axis=1).reshape(-1, 1)
+        x12 = x12**2
+
+        x22 = np.linalg.norm(x2, axis=1).reshape(1, -1)
+        x22 = x22**2
+
+        dist = x12 + x22 - 2 * np.dot(x1, x2.T)
+
+        return dist
+
+    def node_best_lower_bound(self):
+        # ignore min point neighbor
+        if self.lb_ignore_min_dist > 0:
+            mask = self._mask_min_neighbor(self.node_best, self.lb_ignore_min_dist)
+        else:
+            mask = np.ones(self.node_best.shape[0], dtype=bool)
+
         # Get history
-        X = self.history[:, 1:]
-        y = self.history[:, 0]
+        X = self.node_best[mask, 1:]
+        y = self.node_best[mask, 0]
 
         # Get lower bound
         if self.verbose >= 2:
             print("  Finding lower bound function...")
         self.lb_variables, self.lb_expression = self._quadra_lb(X, y)
+
+        # displacement for the lower bound
+        if self.lb_lower_by != 0:
+            self.lb_expression = expression_minus(
+                self.lb_expression, f"({self.lb_lower_by})"
+            )
+
+        if self.verbose:
+            print("  Lower bound function:", self.lb_expression)
         return
+
+    def history_lower_bound(self):
+        # ignore min point neighbor
+        if self.lb_ignore_min_dist > 0:
+            mask = self._mask_min_neighbor(self.history, self.lb_ignore_min_dist)
+        else:
+            mask = np.ones(self.history.shape[0], dtype=bool)
+
+        # Get history
+        X = self.history[mask, 1:]
+        y = self.history[mask, 0]
+
+        # Get lower bound
+        if self.verbose >= 2:
+            print("  Finding lower bound function...")
+        self.lb_variables, self.lb_expression = self._quadra_lb(X, y)
+
+        # displacement for the lower bound
+        if self.lb_lower_by != 0:
+            self.lb_expression = expression_minus(
+                self.lb_expression, f"({self.lb_lower_by})"
+            )
+
+        if self.verbose:
+            print("  Lower bound function:", self.lb_expression)
+        return
+
+    def _mask_min_neighbor(self, y_X, threshold):
+        """
+        Mask the points that are the close to the min point within distance**2 = dist.
+        """
+
+        assert isinstance(y_X, np.ndarray) or isinstance(y_X, jnp.ndarray)
+        assert y_X.ndim == 2
+
+        mask = np.ones(y_X.shape[0], dtype=bool)
+        idx = np.argmin(y_X[:, 0])
+
+        # Distance is computed by X^2 - 2 * X * Y.T + Y^2
+        # We check only single point, so Y^2 is a constant
+        distance1 = np.linalg.norm(y_X[idx, 1:]) ** 2
+        distance2 = -2 * np.dot(y_X[:, 1:], y_X[idx, 1:].T)
+        distance = distance1 + distance2
+
+        mask[distance < threshold] = False
+        mask[idx] = True  # always keep the min point
+
+        return mask
 
     def suggest_box(self):
         """
@@ -503,6 +707,7 @@ class MCMM:
 
         # Get the lower bound function
         self.history_lower_bound()
+        # self.node_best_lower_bound()
 
         # Get the equality relationship
         assert self.lb_variables == self.function_variables
@@ -529,11 +734,3 @@ class MCMM:
             print("Suggested box:", suggest_box)
 
         return suggest_box
-
-    def _box_to_list(self, box):
-        lb = []
-        ub = []
-        for intv in box:
-            lb.append(intv[0])
-            ub.append(intv[1])
-        return lb, ub
