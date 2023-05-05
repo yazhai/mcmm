@@ -138,6 +138,10 @@ class RealVectorTreeNode(SearchNodeABS):
         # force_split is a flag to force split the node
         self.force_split = False
 
+        # terminal is a flag to indicate whether the node should not
+        # be expanded anymore
+        self.terminal = False
+
         self.set_parameters(**kwargs)
 
         return
@@ -158,6 +162,14 @@ class RealVectorTreeNode(SearchNodeABS):
     @y.setter
     def y(self, val):
         self._y = val
+
+    @property
+    def anchor(self):
+        # use first node as anchor
+        try:
+            return self.saved_y_X[0, 1:]
+        except:
+            return None
 
     @property
     def score(self):
@@ -228,4 +240,8 @@ class RealVectorTreeNode(SearchNodeABS):
 
     def set_force_split(self):
         self.force_split = True
+        return
+
+    def set_terminal(self):
+        self.terminal = True
         return

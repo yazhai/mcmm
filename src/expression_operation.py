@@ -1,5 +1,5 @@
 import numpy as np
-from pyibex import Interval, IntervalVector, Function, CtcFwdBwd
+from pyibex import Interval, IntervalVector, Function, CtcFwdBwd, SepFwdBwd
 
 
 def root_box(variables, expression, initial_box, value=0.0):
@@ -15,10 +15,13 @@ def root_box(variables, expression, initial_box, value=0.0):
     root box
     """
     f = Function(*variables, expression)
-    ctc = CtcFwdBwd(f, Interval(value, value))  # root is when f = 0
     X_in = initial_box.copy()
+
+    ctc = CtcFwdBwd(f, Interval(value, value))  # root is when f = 0
     ctc.contract(X_in)
 
+    # sep = SepFwdBwd(f, Interval(value, value))  # root is when f = 0
+    # sep.separate(X_in)
     return X_in
 
 
