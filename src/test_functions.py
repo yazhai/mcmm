@@ -252,6 +252,21 @@ class Dropwave(TestFunction):
     def get_default_domain(self) -> np.ndarray:
         return np.array([[-5.12, 5.12]] * self.dims)
 
+    def expression(self):
+        dims = self.dims
+        x = [f"x[{i}]" for i in range(dims)]
+
+        l2_sum = ""
+        for i in range(dims):
+            l2_sum += f" + (({x[i]})^2)"
+        l2_sum_sqrt = f"sqrt({l2_sum})"
+        term1 = f"1.0 + cos(12.0 * ({l2_sum_sqrt}))"
+        term2 = f"0.5 * ({l2_sum}) + 2.0"
+
+        expression = f"-({term1}) / ({term2})"
+        variables = [f"x[{dims}]"]
+        return variables, expression
+
 
 class SumSquare(TestFunction):
     def __init__(self, dims: int = 2) -> None:
@@ -271,10 +286,22 @@ class SumSquare(TestFunction):
     def get_default_domain(self) -> np.ndarray:
         return np.array([[-10, 10]] * self.dims)
 
+    def expression(self):
+        dims = self.dims
+
+        x = [f"x[{i}]" for i in range(dims)]
+
+        variables = [f"x[{dims}]"]
+        expression = ""
+        for i in range(dims):
+            expression += f" + (({i+1}) * ({x[i]})^2)"
+
+        return variables, expression
+
 
 class Easom(TestFunction):
     def __init__(self, dims: int = 2) -> None:
-        super().__init__(dims)
+        super().__init__(2)  # only 2D
 
     def __call__(self, x: np.ndarray) -> float:
         assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
@@ -286,6 +313,22 @@ class Easom(TestFunction):
 
     def get_default_domain(self) -> np.ndarray:
         return np.array([[-100, 100]] * self.dims)
+
+    def expression(self):
+        dims = self.dims
+        x = [f"x[{i}]" for i in range(dims)]
+
+        sum_term = ""
+        for i in range(dims):
+            sum_term += f" + (({x[i]}) - pi)^2"
+        exp_term = f"exp(-({sum_term}))"
+
+        expression = f"-({exp_term})"
+        for i in range(dims):
+            expression += f" * (cos(({x[i]})))"
+
+        variables = [f"x[{dims}]"]
+        return variables, expression
 
 
 class Michalewicz(TestFunction):
@@ -307,3 +350,17 @@ class Michalewicz(TestFunction):
 
     def get_default_domain(self) -> np.ndarray:
         return np.array([[0, np.pi]] * self.dims)
+
+    def expression(self):
+        dims = self.dims
+        x = [f"x[{i}]" for i in range(dims)]
+
+        sin_term = ""
+        for i in range(dims):
+            sin_term += (
+                f" + sin(({x[i]})) * (sin(({x[i]})^2 * ({i+1}) / pi))^({int(2*self.m)})"
+            )
+
+        expression = f"-({sin_term})"
+        variables = [f"x[{dims}]"]
+        return variables, expression
