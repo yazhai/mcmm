@@ -28,10 +28,11 @@ class MCMM:
         batch_size=1,  # Number of function evaluations at the same time
         max_iterations=10,  # Number of total iterations
         n_eval_local=10,  # Number of allowed function calls in local opt in every iteration
+        n_initial="auto",  # Number of initial points
         dist_max=0.75,  # Max relative distance when create new node
         dist_min=0.25,  # Min relative distance when create new node
         dist_decay=0.5,  # decay factor of distance in every level
-        dist_periodic=True,  # use periodic boundary when create new node
+        clip_periodic=True,  # use periodic boundary when create new node
         node_uct_improve=1.0,  # C_d  for node
         node_uct_n_improve=3,  # number of improves
         node_uct_explore=1.0,  # C_p  for node
@@ -47,17 +48,30 @@ class MCMM:
         self.ub = ub
         self.log = log
         self.dims = len(lb)
+        self.verbose = verbose
 
         # root is initialized to the anchor
         # if anchor is provided
         self.root_anchor = root
         self.root = None
+        if n_initial == "auto":
+            self.n_initial = 2 * self.dims + 1
+        else:
+            assert n_initial > 0
+            self.n_intial = n_initial
 
-        self.verbose = verbose
+        # Caches for history and node best
+        self._cache_expand_size = 1000
+
+        # history saves the history of all evaluations
         self.if_save_history = True
-        self.history_cache = 1000
-        self._history = np.zeros((self.history_cache, 1 + self.dims))
+        self._history = None
         self.history_current_idx = -1
+
+        # node best saves the best value of each node
+        self.if_save_node_best = True
+        self._node_best = None
+        self.node_best_current_idx = -1
 
         # iterations
         self.max_iterations = max_iterations
@@ -69,8 +83,8 @@ class MCMM:
         self.local_opt_eval_num = n_eval_local
         self.local_opt_eval_time = 10
         self.local_opt_algo = nlopt.LD_CCSAQ
-        self.local_opt_ftol_rel = 1e-6
-        self.local_opt_ftol_abs = 1e-6
+        self.local_opt_ftol_rel = 1e-3
+        self.local_opt_ftol_abs = 1e-3
         self.local_opt_xtol_rel = 1e-6
         self.local_opt_xtol_abs = 1e-6
         self.local_opt = None
@@ -79,7 +93,7 @@ class MCMM:
         self.dist_max = dist_max  # Max relative distance when create new node
         self.dist_min = dist_min  # Min relative distance when create new node
         self.dist_decay = dist_decay  # decay factor of distance in every level
-        self.dist_periodic = dist_periodic  # use periodic boundary when create new node
+        self.clip_periodic = clip_periodic  # use periodic boundary when create new node
 
         # exploration related
         self.node_uct_improve = node_uct_improve  # C_d  for node
@@ -94,25 +108,56 @@ class MCMM:
         self.function_variables = function_variables
         self.function_expression = function_expression
 
+        # Learning the lower bound
+        self.found_empty_box = False
+        self.lb_expression = None
+        self.lb_variables = None
+        self.lb_ignore_min_dist = (
+            1e-4  # ignore points with distance smaller than this value
+        )
+        self.lb_lower_by = 0.1  # lower the lower bound by this value
+        self.lb_ignore_coeff = (
+            1e-4  # ignore points with coefficient smaller than this value
+        )
+
         # Update other parameters
         self._box_init = None
         self.set_parameters(**kwargs)
 
         return
 
-    def optimize(self, **kwargs):
+    def optimize(self, restart=False, **kwargs):
         self.set_parameters(**kwargs)
-        self.create_root(self.root_anchor)
 
-        for tt in range(self.max_iterations):
+        if not restart:
+            self.root = None
+            if self.if_save_history:
+                self._history = self._cache_expand()
+                self.history_current_idx = -1
+            if self.if_save_node_best:
+                self._node_best = self._cache_expand()
+                self.node_best_current_idx = -1
+
+        if self.root is None:
+            self.create_root(self.root_anchor)
+
+        tt = 0  # iteration counter
+        while tt < self.max_iterations:
             if self.verbose >= 1:
                 print(f"Running iteration: {tt+1} ...\n")
 
             # selection and expansion
             node = self.select()
+            # when no node is selected
+            # continue to next iteration
+            if node is None:
+                if self.verbose >= 2:
+                    print(f"  No node is suggested. Rodo iteration {tt+1}.\n")
+                continue
 
             # local optimization
             y_best, x_best = self.optimize_node(node)
+            # save the best value to node best
 
             # back propagation
             self.backprop(node, x_best, y_best)
@@ -120,8 +165,9 @@ class MCMM:
             # Information
             if self.verbose >= 1:
                 print(f"  Best found value until iteration {tt+1} is: {self.root.y} \n")
-            if self.verbose >= 3:
-                self.print()
+
+            # next iteration
+            tt += 1
         return self.root.y
 
     def set_parameters(self, **kwargs):
@@ -139,23 +185,7 @@ class MCMM:
         if np.sum(self.root.improves[-5:]) > 1e-5:
             return self.mctd_select()
 
-        # find a box
-        box = self.suggest_box()
-        if box is None:
-            return self.mctd_select()
-
-        # create a new node with the box
-        _lb, _ub = self._box_to_list(box)
-        _lb = np.array(_lb)
-        _ub = np.array(_ub)
-        anchor = self.uniform_sample(_lb, _ub)
-        node = self.create_node(anchor)
-
-        # add the node to the root node
-        parent = self.root
-        node.set_parent(parent)
-        node.identifier = parent.identifier + "_" + str(len(parent.children))
-        return node
+        return self.mctd_select()
 
     def mctd_select(self, node=None):
         if node is None:
@@ -197,7 +227,7 @@ class MCMM:
 
         return node
 
-    def expand(self, node):
+    def expand(self, node, method="suggest"):
         parent_identifier = node.identifier
 
         # if it is a leaf node, use node.X/y as anchor for a copied child node at index 0
@@ -211,45 +241,81 @@ class MCMM:
             copynode.visit = node.visit
 
         # create a new child node at index N
+
+        if method == "random":
+            child = self._expand_in_ring(node)
+
+        elif method == "suggest":
+            # Try to expand by suggest in box.
+            # If no suggestion, it means the box is empty.
+            # Then the node is the best around its neightbor already.
+            # Never split it anymore and return None
+            child = self._expand_by_suggest(node)
+            if child is None:
+                node.set_terminal()
+                return None
+
+        if self.verbose >= 2:
+            print(f"  Expanded: new child node {child.identifier} is created.")
+        return child
+
+    def _expand_in_ring(self, node):
+        # create a new child at the end of the children list on node
         # by placing an anchor point with the distance D from node.X
         # D is within [-dist_max, -dist_min] U [dist_min, dist_max]
         # sampled from a uniform distribution
-        x_anchor = copy.deepcopy(node.X)
+        # x_orig = copy.deepcopy(node.X)
+        x_orig = copy.deepcopy(node.anchor)
 
         dist_box = self.ub - self.lb
         dist_min = self.dist_min * (self.dist_decay**node.level) * dist_box
         dist_max = self.dist_max * (self.dist_decay**node.level) * dist_box
 
-        # create a random ratio in (0, 1)
-        # project (0.5, 1) to (dist_min, dist_max)
-        # and (0, 0.5) to (-dist_max, -dist_min)
-        ratio = self._cache_rand()
-        ratio_mask = ratio < 0.5
-        ratio = ratio * 2 - 1
-
-        dist_min_plus_neg = np.ones(self.dims)
-        dist_min_plus_neg[ratio_mask] = -1
-
-        dist = dist_min * dist_min_plus_neg + (dist_max - dist_min) * ratio
-        x_anchor += dist
-
-        if self.dist_periodic:
-            box = self.ub - self.lb
-            for ii in range(x_anchor.shape[0]):
-                while x_anchor[ii] > self.ub[ii]:
-                    x_anchor[ii] -= box[ii]
-                while x_anchor[ii] < self.lb[ii]:
-                    x_anchor[ii] += box[ii]
-        else:
-            x_anchor = np.clip(x_anchor, self.lb, self.ub)
+        x_anchor = self._sample_in_ring(x_orig, dist_min, dist_max)
 
         child = self.create_node(x_anchor)
-        child.identifier = parent_identifier + "_" + str(len(node.children))
+        child.identifier = node.identifier + "_" + str(len(node.children))
         child.set_parent(node)
+        return child
 
+    def _expand_by_suggest(self, node):
+        # create a new child at the end of the children list on node
+        # by placing an anchor point in the box
+        # where the lb_expression and fn_expression can match
+        # x_orig = copy.deepcopy(node.X)
+        x_orig = copy.deepcopy(node.anchor)
+
+        # get the box near the node
+        dist_box = self.ub - self.lb
+        dist = (
+            (self.dist_min + self.dist_max)
+            / 2
+            * (self.dist_decay**node.level)
+            * dist_box
+        )
+
+        _lb = x_orig - dist
+        _ub = x_orig + dist
+
+        _lb = self._clip_point(_lb, clip_periodic=False)
+        _ub = self._clip_point(_ub, clip_periodic=False)
+
+        init_box = self._list_to_box(_lb, _ub)
+
+        # find a box
+        suggest_box = self.suggest_box(init_box)
         if self.verbose >= 2:
-            print(f"  Expanded: new child node {child.identifier} is created. \n")
+            print(f"    Initial box: {init_box}")
+            print(f"    Suggested box: {suggest_box}")
+        exist_empty_box = any([Interval.is_empty(intv) for intv in suggest_box])
+        if exist_empty_box:
+            return None
 
+        # create a new point within the box
+        x_anchor = self._sample_in_box(suggest_box)
+        child = self.create_node(x_anchor)
+        child.identifier = node.identifier + "_" + str(len(node.children))
+        child.set_parent(node)
         return child
 
     def optimize_node(self, node):
@@ -300,6 +366,9 @@ class MCMM:
             y_best = node.y
             curr_node = node.parent
 
+        if self.if_save_node_best:
+            self.add_node_best(x_best, y_best)
+
         while curr_node:
             curr_node.update_stat(y_best, x_best)
             curr_node.visit_once()
@@ -322,21 +391,52 @@ class MCMM:
         return y
 
     def add_history(self, x, y):
-        self.history_current_idx += 1
-
-        if self.history_current_idx >= self._history.shape[0]:
-            self._history = np.concatenate(
-                (self._history, np.zeros((self.history_cache, 1 + self.dims))), axis=0
-            )
-
-        self._history[self.history_current_idx, 0] = y
-        self._history[self.history_current_idx, 1:] = x
+        self._add_to_cache(x, y, cache="global")
         return
+
+    def add_node_best(self, x, y):
+        self._add_to_cache(x, y, cache="node")
+        return
+
+    def _add_to_cache(self, x, y, cache="global"):
+        idx = -1
+        if cache == "global":
+            self.history_current_idx += 1
+            if self.history_current_idx >= self._history.shape[0]:
+                self._history = self._cache_expand(self._history)
+            history = self._history
+            idx = self.history_current_idx
+        elif cache == "node":
+            self.node_best_current_idx += 1
+            if self.node_best_current_idx >= self._node_best.shape[0]:
+                self._node_best = self._cache_expand(self._node_best)
+            history = self._node_best
+            idx = self.node_best_current_idx
+        else:
+            raise ValueError("Invalid cache type.")
+
+        history[idx, 0] = y
+        history[idx, 1:] = x
+        return
+
+    def _cache_expand(self, cache_array=None):
+        if cache_array is None:
+            cache_array = np.zeros((self._cache_expand_size, 1 + self.dims))
+        else:
+            cache_array = np.concatenate(
+                (cache_array, np.zeros((self._cache_expand_size, 1 + self.dims))),
+                axis=0,
+            )
+        return cache_array
 
     def get_ucts(self, node):
         ucts = []
         visit_parent = max(node.visit, 1)
         for child in node.children:
+            # ternimal node never be selected
+            if child.terminal:
+                ucts.append(-np.inf)
+                continue
             uct = child.score
             visit = max(child.visit, 1)
             uct += np.sqrt(np.log(visit_parent) / visit) * self.node_uct_explore
@@ -360,10 +460,20 @@ class MCMM:
         return uct_explore
 
     def create_root(self, anchor=None):
+        # create root node by anchor
         self.root = self.create_node(anchor)
         self.root.is_root = True
         self.root.set_level()
         self.root.identifier = "root"
+
+        y_best, X_best = self.optimize_node(self.root)
+        self.backprop(self.root, X_best, y_best)
+
+        # Multiple starting nodes: put all nodes into the first level
+        for ii in range(self.n_initial - 1):
+            child = self.expand(self.root, method="random")
+            y_best, X_best = self.optimize_node(child)
+            self.backprop(child, X_best, y_best)
         return
 
     def create_node(self, x_anchor=None, y_anchor=None):
@@ -398,15 +508,13 @@ class MCMM:
         return sample
 
     def _cache_rand(self, cache_size=1000):
-        """
-        Cache uniform sampling from numpy.random.rand
-        Store a pool of random samples as class variable for next call.
+        # Cache uniform sampling from numpy.random.rand
+        # Store a pool of random samples as class variable for next call.
+        # Input:
+        #     cache_size
+        # Output:
+        #     A random sample
 
-        Input:
-            cache_size
-        Output:
-            A random sample
-        """
         try:
             # use cached random samples
             self._uniform_sample_pool_last_idx += 1
@@ -453,7 +561,33 @@ class MCMM:
     def history(self):
         return self._history[: self.history_current_idx + 1, :]
 
+    @property
+    def node_best(self):
+        return self._node_best[: self.node_best_current_idx + 1, :]
+
+    def _box_to_list(self, box):
+        lb = []
+        ub = []
+        for intv in box:
+            lb.append(intv[0])
+            ub.append(intv[1])
+        return lb, ub
+
+    def _list_to_box(self, lb, ub):
+        box = []
+        for ii in range(len(lb)):
+            box.append([lb[ii], ub[ii]])
+        return IntervalVector(box)
+
     def _quadra_lb(self, X, y):
+        """
+        Compute a quadratic lower bound function for the given data
+
+        Return:
+            variables: a list of variables
+            expression: a sympy expression
+        """
+
         # Get best point
         idx_best = np.argmin(y)
         y_best = y[idx_best]
@@ -474,26 +608,104 @@ class MCMM:
         quadra_coeff *= 0.5
 
         # Update the lower bound function
-        variables, expression = expression_quadratic(x_best, quadra_coeff, y_best)
+        variables, expression = expression_quadratic(
+            x_best, quadra_coeff, y_best, self.lb_ignore_coeff
+        )
 
         if self.verbose >= 2:
-            print(" Quadra LB:", x_best, quadra_coeff, y_best)
-            print("Expression:", expression)
-
+            print(" Quadra LB center:", x_best)
+            print(" Quadra LB coefficients:", quadra_coeff)
         return variables, expression
 
-    def history_lower_bound(self):
+    def _distance(self, x1, x2=None):
+        if x2 is None:
+            x2 = x1
+
+        x12 = np.linalg.norm(x1, axis=1).reshape(-1, 1)
+        x12 = x12**2
+
+        x22 = np.linalg.norm(x2, axis=1).reshape(1, -1)
+        x22 = x22**2
+
+        dist = x12 + x22 - 2 * np.dot(x1, x2.T)
+
+        return dist
+
+    def node_best_lower_bound(self):
+        # ignore min point neighbor
+        if self.lb_ignore_min_dist > 0:
+            mask = self._mask_min_neighbor(self.node_best, self.lb_ignore_min_dist)
+        else:
+            mask = np.ones(self.node_best.shape[0], dtype=bool)
+
         # Get history
-        X = self.history[:, 1:]
-        y = self.history[:, 0]
+        X = self.node_best[mask, 1:]
+        y = self.node_best[mask, 0]
 
         # Get lower bound
         if self.verbose >= 2:
             print("  Finding lower bound function...")
         self.lb_variables, self.lb_expression = self._quadra_lb(X, y)
+
+        # displacement for the lower bound
+        if self.lb_lower_by != 0:
+            self.lb_expression = expression_minus(
+                self.lb_expression, f"({self.lb_lower_by})"
+            )
+
+        if self.verbose:
+            print("  Lower bound function:", self.lb_expression)
         return
 
-    def suggest_box(self):
+    def history_lower_bound(self):
+        # ignore min point neighbor
+        if self.lb_ignore_min_dist > 0:
+            mask = self._mask_min_neighbor(self.history, self.lb_ignore_min_dist)
+        else:
+            mask = np.ones(self.history.shape[0], dtype=bool)
+
+        # Get history
+        X = self.history[mask, 1:]
+        y = self.history[mask, 0]
+
+        # Get lower bound
+        if self.verbose >= 2:
+            print("  Finding lower bound function...")
+        self.lb_variables, self.lb_expression = self._quadra_lb(X, y)
+
+        # displacement for the lower bound
+        if self.lb_lower_by != 0:
+            self.lb_expression = expression_minus(
+                self.lb_expression, f"({self.lb_lower_by})"
+            )
+
+        if self.verbose:
+            print("  Lower bound function:", self.lb_expression)
+        return
+
+    def _mask_min_neighbor(self, y_X, threshold):
+        """
+        Mask the points that are the close to the min point within distance**2 = dist.
+        """
+
+        assert isinstance(y_X, np.ndarray) or isinstance(y_X, jnp.ndarray)
+        assert y_X.ndim == 2
+
+        mask = np.ones(y_X.shape[0], dtype=bool)
+        idx = np.argmin(y_X[:, 0])
+
+        # Distance is computed by X^2 - 2 * X * Y.T + Y^2
+        # We check only single point, so Y^2 is a constant
+        distance1 = np.linalg.norm(y_X[idx, 1:]) ** 2
+        distance2 = -2 * np.dot(y_X[:, 1:], y_X[idx, 1:].T)
+        distance = distance1 + distance2
+
+        mask[distance < threshold] = False
+        mask[idx] = True  # always keep the min point
+
+        return mask
+
+    def suggest_box(self, init_box=None, lb_from="global" or "node"):
         """
         Suggest a box that is likely to have a point where the current lb function equals the objective function.
         """
@@ -502,7 +714,13 @@ class MCMM:
             return None
 
         # Get the lower bound function
-        self.history_lower_bound()
+        if lb_from == "global":
+            self.history_lower_bound()
+        elif lb_from == "node":
+            self.node_best_lower_bound()
+        else:
+            print(f"Unknown lb_from: {lb_from}")
+            return None
 
         # Get the equality relationship
         assert self.lb_variables == self.function_variables
@@ -510,30 +728,74 @@ class MCMM:
             self.function_expression, self.lb_expression
         )
 
-        # Initial box is the entire space
-        if self._box_init is None:
-            intervals = []
-            for i in range(len(self.lb)):
-                _int = [self.lb[i], self.ub[i]]
-                intervals.append(_int)
-            self._box_init = IntervalVector(intervals)
-        if self.verbose >= 2:
-            print("  Suggesting box with initial box...")
+        # Initial box is the entire space if not provided
+        if init_box is None:
+            if self._box_init is None:
+                intervals = []
+                for i in range(len(self.lb)):
+                    _int = [self.lb[i], self.ub[i]]
+                    intervals.append(_int)
+                self._box_init = IntervalVector(intervals)
+            init_box = self._box_init
+
+        # Find a box
         suggest_box = root_box(
             self.lb_variables,
             expression_equality,
-            self._box_init,
+            init_box,
         )
-
-        if self.verbose >= 2:
-            print("Suggested box:", suggest_box)
 
         return suggest_box
 
-    def _box_to_list(self, box):
-        lb = []
-        ub = []
-        for intv in box:
-            lb.append(intv[0])
-            ub.append(intv[1])
-        return lb, ub
+    def _clip_point(self, x, clip_periodic=None):
+        if clip_periodic is None:
+            clip_periodic = self.clip_periodic
+        if clip_periodic:
+            box = self.ub - self.lb
+            for ii in range(self.dims):
+                while x[ii] > self.ub[ii]:
+                    x[ii] -= box[ii]
+                while x[ii] < self.lb[ii]:
+                    x[ii] += box[ii]
+        else:
+            x = np.clip(x, self.lb, self.ub)
+        return x
+
+    def _sample_in_ring(self, x_center, dist_min, dist_max):
+        # dist_min/max: either a non-negative float
+        # or a list of non-negative floats or a numpy array
+        # x_center: a numpy array
+        # return: a sample as a numpy array
+
+        # create a random ratio in (0, 1)
+        # project (0.5, 1) to (dist_min, dist_max)
+        # and (0, 0.5) to (-dist_max, -dist_min)
+        ratio = self._cache_rand()
+        ratio_mask = ratio < 0.5
+        ratio = ratio * 2 - 1
+
+        dist_min_plus_neg = np.ones(self.dims)
+        dist_min_plus_neg[ratio_mask] = -1
+
+        dist = dist_min * dist_min_plus_neg + (dist_max - dist_min) * ratio
+        x_return = x_center + dist
+        x_return = self._clip_point(x_return)
+        return x_return
+
+    def _sample_in_box(self, box):
+        # box is an interval vector with length = dims
+        # If there is empty interval, return None
+
+        assert isinstance(box, IntervalVector)
+        # check if the box contains empty
+        contains_empty = any(Interval.is_empty(inv) for inv in box)
+        if contains_empty:
+            return None
+
+        # create a new point with the box
+        _lb, _ub = self._box_to_list(box)
+        _lb = np.array(_lb)
+        _ub = np.array(_ub)
+        x_new = self.uniform_sample(_lb, _ub)
+        x_new = self._clip_point(x_new)
+        return x_new

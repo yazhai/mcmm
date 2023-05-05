@@ -1,5 +1,5 @@
 import numpy as np
-from pyibex import Interval, IntervalVector, Function, CtcFwdBwd
+from pyibex import Interval, IntervalVector, Function, CtcFwdBwd, SepFwdBwd
 
 
 def root_box(variables, expression, initial_box, value=0.0):
@@ -15,10 +15,13 @@ def root_box(variables, expression, initial_box, value=0.0):
     root box
     """
     f = Function(*variables, expression)
-    ctc = CtcFwdBwd(f, Interval(value, value))  # root is when f = 0
     X_in = initial_box.copy()
+
+    ctc = CtcFwdBwd(f, Interval(value, value))  # root is when f = 0
     ctc.contract(X_in)
 
+    # sep = SepFwdBwd(f, Interval(value, value))  # root is when f = 0
+    # sep.separate(X_in)
     return X_in
 
 
@@ -30,7 +33,9 @@ def expression_minus(exp1: str, exp2: str) -> str:
     return f"({exp1}) - ({exp2})"
 
 
-def expression_quadratic(x0: list, k: list, c: float = 0.0) -> str:
+def expression_quadratic(
+    x0: list, k: list, c: float = 0.0, k_thres: float = 0.0
+) -> str:
     """
     Return the quadratic function expression in string format
     The function is in the form of \sum (k * (x - x0)^2) + c
@@ -39,6 +44,7 @@ def expression_quadratic(x0: list, k: list, c: float = 0.0) -> str:
     x0: center of the quadratic function, float or numpy array
     k: coefficient of the quadratic function, float or numpy array
     c: constant of the quadratic function, float
+    k_thres: smallest coefficient that will be kept non-zero, float
 
     return:
     variables in the quadratic function, list of str
@@ -62,8 +68,9 @@ def expression_quadratic(x0: list, k: list, c: float = 0.0) -> str:
     variables = [f"x[{len(x0_list)}]"]
     expression = ""
     for i in range(len(x0_list)):
-        expression += f" {k_list[i]} * (x[{i}] - {x0_list[i]})^2 + "
+        if k_list[i] > k_thres:
+            expression += f" + ({k_list[i]} * (x[{i}] - ({x0_list[i]}))^2) "
 
-    expression += f"({c})"
+    expression += f" + ({c}) "
 
     return variables, expression
