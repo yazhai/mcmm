@@ -2,8 +2,6 @@ import re, copy
 
 from dreal import *
 
-from src.expression_dreal import *
-
 """ 
 # Example to use functions in this file:
 #
