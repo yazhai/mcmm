@@ -4,6 +4,51 @@ from dreal import *
 
 from src.expression_dreal import *
 
+""" 
+# Example to use functions in this file:
+#
+from src.test_functions import Ackley, ToyObjective
+
+# Define two functions
+dims = 10
+f = Ackley(dims=dims)
+f_var_exp, f_exp = f.expression()  # variable expression and function expression
+g = ToyObjective(dims=dims)
+g_var_exp, g_exp = g.expression()
+
+
+# Create dReal variables;
+# Note that the variables should be the same for both functions
+# Here we define the variables based on the first function
+var_exp = f_var_exp
+assert var_exp == g_var_exp
+var_dreal = create_dreal_variables(var_exp)
+
+# Get the dReal constraints for the two functions
+fval_var_dreal, f_constraint_dreal = make_expression_dreal_constraint(
+    var_dreal, f_exp, f"fval"
+)
+
+gval_var_dreal, g_constraint_dreal = make_expression_dreal_constraint(
+    var_dreal, g_exp, f"gval"
+)
+
+# Get the dReal constraints for the box
+box = f.get_default_domain()
+box_constraint_dreal = make_interval_dreal_constraint(var_dreal, box)
+
+# All constraint
+constraint = dreal_And(
+    f_constraint_dreal,
+    g_constraint_dreal,
+    box_constraint_dreal,
+    fval_var_dreal == gval_var_dreal,  # check f == g
+)
+
+# Run dReal.CheckSat
+dreal.CheckSatisfiability(constraint, 1.0)
+"""
+
 
 def create_dreal_variables(variable_names: list):
     """
