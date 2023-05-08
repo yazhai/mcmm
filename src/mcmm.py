@@ -14,6 +14,8 @@ from pyibex import Interval, IntervalVector
 from .node import RealVectorTreeNode
 from .linear import max_linear_weight
 from .expression_operation import *
+from .helper_ibex import root_box
+from .helper_scipy import root_find
 
 
 class MCMM:
@@ -41,6 +43,7 @@ class MCMM:
         branch_explore=1.0,  # C_p' for branch
         function_variables=None,  # symbolic variables of the function
         function_expression=None,  # symbolic expression of the function
+        suggest_by="root",  # "root" (the root of f==lb) or "box" (within box f==lb)
         **kwargs,
     ):
         self.fn = fn
@@ -58,7 +61,7 @@ class MCMM:
             self.n_initial = 2 * self.dims + 1
         else:
             assert n_initial > 0
-            self.n_intial = n_initial
+            self.n_initial = n_initial
 
         # Caches for history and node best
         self._cache_expand_size = 1000
@@ -109,7 +112,9 @@ class MCMM:
         self.function_expression = function_expression
 
         # Learning the lower bound
-        self.found_empty_box = False
+        self.suggest_failed = False
+        self.lb_function = None
+        self.lb_prime_function = None
         self.lb_expression = None
         self.lb_variables = None
         self.lb_ignore_min_dist = (
@@ -118,6 +123,9 @@ class MCMM:
         self.lb_lower_by = 0.1  # lower the lower bound by this value
         self.lb_ignore_coeff = (
             1e-4  # ignore points with coefficient smaller than this value
+        )
+        self.suggest_by = (
+            suggest_by  # "root" (the root of f==lb) or "box" (within box f==lb)
         )
 
         # Update other parameters
@@ -142,6 +150,7 @@ class MCMM:
             self.create_root(self.root_anchor)
 
         tt = 0  # iteration counter
+        no_suggest = 0  # number of iterations without suggestion
         while tt < self.max_iterations:
             if self.verbose >= 1:
                 print(f"Running iteration: {tt+1} ...\n")
@@ -151,6 +160,11 @@ class MCMM:
             # when no node is selected
             # continue to next iteration
             if node is None:
+                # add safeguard to avoid infinite loop
+                no_suggest += 1
+                if no_suggest >= 3:
+                    no_suggest = 0
+                    tt += 1
                 if self.verbose >= 2:
                     print(f"  No node is suggested. Rodo iteration {tt+1}.\n")
                 continue
@@ -168,6 +182,7 @@ class MCMM:
 
             # next iteration
             tt += 1
+            no_suggest = 0
         return self.root.y
 
     def set_parameters(self, **kwargs):
@@ -302,17 +317,43 @@ class MCMM:
 
         init_box = self._list_to_box(_lb, _ub)
 
-        # find a box
-        suggest_box = self.suggest_box(init_box)
-        if self.verbose >= 2:
-            print(f"    Initial box: {init_box}")
-            print(f"    Suggested box: {suggest_box}")
-        exist_empty_box = any([Interval.is_empty(intv) for intv in suggest_box])
-        if exist_empty_box:
+        if self.suggest_by == "box":
+            # find a box
+            suggest_box = self.suggest_box(init_box)
+            if self.verbose >= 2:
+                print(f"    Initial box: {init_box}")
+                print(f"    Suggested box: {suggest_box}")
+            exist_empty_box = any([Interval.is_empty(intv) for intv in suggest_box])
+            if exist_empty_box:
+                return None
+            # create a new point within the box
+            x_anchor = self._sample_in_box(suggest_box)
+            if x_anchor is None:
+                return None
+        elif self.suggest_by == "root":
+            # guess a random starting point
+            x_guess = self._sample_in_box(init_box)
+
+            # find a point
+            x_anchor, y_anchor = self.suggest_crossing_point(x_guess)
+            if self.verbose >= 2:
+                print(f"    Suggested value: {y_anchor}")
+                print(f"    Suggested point: {x_anchor}")
+            if y_anchor > self.lb_lower_by:
+                if self.verbose >= 2:
+                    print(f"    Suggested value is too high, not expanding.")
+                return None
+            distance = self._distance(self.history[:, 1:], x_anchor)
+            if np.any(distance < self.lb_ignore_min_dist):
+                if self.verbose >= 2:
+                    print(
+                        f"    Suggested point is too close to existing points, not expanding."
+                    )
+                return None
+        else:
             return None
 
-        # create a new point within the box
-        x_anchor = self._sample_in_box(suggest_box)
+        # create a new child node
         child = self.create_node(x_anchor)
         child.identifier = node.identifier + "_" + str(len(node.children))
         child.set_parent(node)
@@ -451,12 +492,21 @@ class MCMM:
     def get_uct_explore(self, node):
         uct_explore = 0
         visit_parent = max(node.visit, 1)
+        score_best = 0
         if node.children:
             for ii in range(len(node.children)):
                 child = node.children[ii]
-                uct_explore += -child.y
-            uct_explore /= len(node.children)
-        uct_explore += np.sqrt(np.log(visit_parent)) * self.branch_explore
+                if child.score > score_best:
+                    score_best = child.score
+            #     uct_explore += -child.y
+            # uct_explore /= len(node.children)
+
+        if score_best > -np.inf:
+            uct_explore = score_best
+        else:
+            uct_explore = 0.0
+        # uct_explore += 1.0 / (visit_parent**2) * self.branch_explore
+        uct_explore += 1 - np.exp(np.sum(node.improves[-3:])) * self.branch_explore
         return uct_explore
 
     def create_root(self, anchor=None):
@@ -606,11 +656,19 @@ class MCMM:
         # Make the coefficient under-approximation
         # to guarantee the lower bound is always below the true function
         quadra_coeff *= 0.5
+        quadra_coeff[quadra_coeff < self.lb_ignore_coeff] = 0
+
+        # save the lower bound function
+        def function_quadratic(x):
+            # Compute the quadratic function
+            result = jnp.sum((x - x_best) ** 2 * quadra_coeff) + y_best
+            return result
+
+        self.lb_function = function_quadratic
+        self.lb_prime_function = jax_grad(function_quadratic)
 
         # Update the lower bound function
-        variables, expression = expression_quadratic(
-            x_best, quadra_coeff, y_best, self.lb_ignore_coeff
-        )
+        variables, expression = expression_quadratic(x_best, quadra_coeff, y_best)
 
         if self.verbose >= 2:
             print(" Quadra LB center:", x_best)
@@ -645,6 +703,7 @@ class MCMM:
         # Get lower bound
         if self.verbose >= 2:
             print("  Finding lower bound function...")
+            print(f" X = {X}, y={y}")
         self.lb_variables, self.lb_expression = self._quadra_lb(X, y)
 
         # displacement for the lower bound
@@ -696,14 +755,30 @@ class MCMM:
 
         # Distance is computed by X^2 - 2 * X * Y.T + Y^2
         # We check only single point, so Y^2 is a constant
-        distance1 = np.linalg.norm(y_X[idx, 1:]) ** 2
-        distance2 = -2 * np.dot(y_X[:, 1:], y_X[idx, 1:].T)
-        distance = distance1 + distance2
+        distance = self._distance(y_X[:, 1:], y_X[idx, 1:])
+        distance = distance.reshape(-1)
 
         mask[distance < threshold] = False
         mask[idx] = True  # always keep the min point
 
         return mask
+
+    def _distance(self, x1, x2=None):
+        if x2 is None:
+            x2 = x1
+
+        if x2.ndim == 1:
+            x2 = x2.reshape(1, -1)
+
+        x12 = np.linalg.norm(x1, axis=1).reshape(-1, 1)
+        x12 = x12**2
+
+        x22 = np.linalg.norm(x2, axis=1).reshape(1, -1)
+        x22 = x22**2
+
+        dist = x12 + x22 - 2 * np.dot(x1, x2.T)
+
+        return dist
 
     def suggest_box(self, init_box=None, lb_from="global" or "node"):
         """
@@ -799,3 +874,37 @@ class MCMM:
         x_new = self.uniform_sample(_lb, _ub)
         x_new = self._clip_point(x_new)
         return x_new
+
+    def suggest_crossing_point(self, x_init=None, lb_from="global" or "node"):
+        """
+        Suggest a point where the current lb function equals the objective function.
+        """
+        if self.function_expression is None:
+            print("No function expression is provided. Cannot suggest box.")
+            return None
+
+        # Get the lower bound function
+        if lb_from == "global":
+            self.history_lower_bound()
+        elif lb_from == "node":
+            self.node_best_lower_bound()
+        else:
+            print(f"Unknown lb_from: {lb_from}")
+            return None
+
+        # Starting point
+        if x_init is None:
+            x_init = self.uniform_sample(self.lb, self.ub)
+
+        # define the objective function and prime
+        def obj(x):
+            return self.fn(x) - self.lb_function(x)
+
+        def prime(x):
+            return jax_grad(self.fn)(x) - self.lb_prime_function(x)
+
+        # find best point
+        x_best, y_best = root_find(obj, x_init, prime)
+        x_best = self._clip_point(x_best)
+
+        return x_best, y_best
