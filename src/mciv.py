@@ -366,6 +366,14 @@ class MCIV:
             box.append([lb[ii], ub[ii]])
         return IntervalVector(box)
 
+    @property
+    def history(self):
+        return self._history[: self.history_current_idx + 1, :]
+
+    @property
+    def node_best(self):
+        return self._node_best[: self.node_best_current_idx + 1, :]
+
     def expect_grad_hessian(self, inputs):
         # Compute the expected gradient and hessian(diagonal) of the function
         # inputs: list of nodes or list of x points
@@ -447,6 +455,16 @@ class MCIV:
 
         return x_new
 
+    def guess_good_local(self, node):
+        # Use newton's method to find a good point to improve the current node
+        x = copy.deepcopy(node.X)
+        fprime, fhess = self.expect_grad_hessian([x])
+
+        # Guess a good point to improve the current node
+        x_new = self._guess_good(x, fprime, fhess)
+
+        return x_new
+
     def node_exploitation(self, parent):
         # Create next level nodes by random sampling
         parent_name = parent.identifier
@@ -467,7 +485,7 @@ class MCIV:
                 parent.X,
             )
 
-        # Create a new sample by guessing a good point
+        # Create a new sample by guessing a good point by neighbor fprime and global fhess
         # using newton's method for convex functions
         # using gradient descent for concave functions
         anchor = self.guess_good(parent)
@@ -477,8 +495,71 @@ class MCIV:
         X_best = child.X
         y_best = child.y
         self.backprop(child, X_best, y_best)
+        if self.verbose >= 2:
+            print(
+                f"New node {child.identifier} by optimizing with global Hessian and neighbor gradient: ",
+                child.y,
+                child.X,
+            )
+
+        # Create another new sample by guessing a good point from local fprime and fhess
+        # using newton's method for convex functions
+        # using gradient descent for concave functions
+        anchor = self.guess_good_local(parent)
+        child = self.create_node(anchor)
+        child.set_parent(parent)
+        child.identifier = parent.identifier + "_" + f"{len(parent.children)}"
+        X_best = child.X
+        y_best = child.y
+        self.backprop(child, X_best, y_best)
 
         if self.verbose >= 2:
-            print(f"New node {child.identifier} by expect : ", child.y, child.X)
+            print(
+                f"New node {child.identifier} by optimizing with local Hessian and local gradient: ",
+                child.y,
+                child.X,
+            )
 
         return parent.y, parent.X
+
+
+if __name__ == "__main__":
+    # run a test case with Ackley function
+    from .test_functions import Ackley
+
+    dims = 2
+    fn = Ackley(dims=dims)
+    lb = -10 * np.ones(dims)
+    ub = 10 * np.ones(dims)
+
+    var_exp = None
+    fn_exp = None
+    try:
+        var_exp, fn_exp = fn.expression()
+    except:
+        pass
+
+    alg = MCIV(
+        fn=fn,
+        lb=lb,
+        ub=ub,
+        function_variables=var_exp,
+        function_expression=fn_exp,
+        n_eval_local=1000,
+        lb_ignore_coeff=1e-3,
+        lb_displacement=0.1,
+    )
+
+    result_list = []
+    history_list = []
+    for _ in range(5):
+        res = alg.optimize(
+            verbose=2,
+            max_iterations=100,
+            n_initial=5,
+            node_uct_explore=1.0,
+        )
+        result_list.append(res)
+        history_list.append(alg.history)
+
+    print("Result list:", result_list)
