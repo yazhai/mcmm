@@ -323,7 +323,7 @@ class MCIV:
             lb = self.lb
         if ub is None:
             ub = self.ub
-        samples = self.sampler(n=num_samples)
+        samples = self.advanced_sampler.random(n=num_samples)
         samples = lb + (ub - lb) * samples
         return samples
 
@@ -550,7 +550,8 @@ class MCIV:
         #     self.backprop(child, X_best, y_best)
 
         # # Advanced sampling approach to sample num_node_expand nodes
-        anchors_all = self.advanced_sampler.random(n=self.num_node_expand)
+        lb, ub = self.node_bounds[parent.name]
+        anchors_all = self.advance_sample(self.num_node_expand, lb=lb, ub=ub)
         for anchor in anchors_all:
             # Put nodes into the child level
             child = self.create_node(anchor)
