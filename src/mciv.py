@@ -253,7 +253,10 @@ class MCIV:
             xs = []
             for ii in range(len(node.children)):
                 child = node.children[ii]
-                xs.append(child.anchor)
+                _x = child.anchor
+                # Make sure the anchor is within the box
+                _x = self._clip_point(_x, lb=lb, ub=ub, clip_periodic=False)
+                xs.append(_x)
             xs = np.array(xs)
 
             # split the box; randomly choose a dimension
@@ -601,3 +604,21 @@ class MCIV:
             )
 
         return parent.y, parent.X
+
+    def _clip_point(self, x, lb=None, ub=None, clip_periodic=None):
+        if lb is None:
+            lb = self.lb
+        if ub is None:
+            ub = self.nb
+        if clip_periodic is None:
+            clip_periodic = self.clip_periodic
+        if clip_periodic:
+            box = ub - lb
+            for ii in range(self.dims):
+                while x[ii] > ub[ii]:
+                    x[ii] -= box[ii]
+                while x[ii] < lb[ii]:
+                    x[ii] += box[ii]
+        else:
+            x = np.clip(x, lb, ub)
+        return x
