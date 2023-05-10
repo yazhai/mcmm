@@ -10,6 +10,8 @@ import jax.numpy as jnp
 from jax import grad as jax_grad
 from jax import hessian as jax_hessian
 
+from scipy.stats import qmc
+
 from pyibex import Interval, IntervalVector
 
 from .node import RealVectorTreeNode
@@ -29,13 +31,14 @@ class MCIV:
         batch_size=1,  # Number of function evaluations at the same time
         max_iterations=10,  # Number of total iterations
         n_eval_local=10,  # Number of allowed function calls in local opt in every iteration
-        n_initial="auto",  # Number of initial points
+        num_node_expand="auto",  # Number of initial points
         dist_max=0.75,  # Max relative distance when create new node
         dist_min=0.25,  # Min relative distance when create new node
         dist_decay=0.5,  # decay factor of distance in every level
         clip_periodic=True,  # use periodic boundary when create new node
         node_uct_improve=0.0,  # C_d  for node
         node_uct_n_improve=0,  # number of improves
+        node_uct_lb_coeff=1.0,  # coefficient for interval lb
         node_uct_explore=1.0,  # C_p  for node
         leaf_improve=100.0,  # C_d'' for leaf
         leaf_explore=10.0,  # C_p'' for leaf
@@ -45,24 +48,25 @@ class MCIV:
         suggest_by="root",  # "root" (the root of f==lb) or "box" (within box f==lb)
         **kwargs,
     ):
+        # function
         self.fn = fn
+        if not isinstance(lb, np.ndarray):
+            lb = np.array(lb)
         self.lb = lb
+        if not isinstance(ub, np.ndarray):
+            ub = np.array(ub)
         self.ub = ub
-        self.log = log
         self.dims = len(lb)
+
+        # Symbolic expression of the function
+        self.function_variables = function_variables
+        self.function_expression = function_expression
+
+        # logging
+        self.log = log
         self.verbose = verbose
 
-        # root is initialized to the anchor
-        # if anchor is provided
-        self.root_anchor = root
-        self.root = None
-        if n_initial == "auto":
-            self.n_initial = 2 * self.dims + 1
-        else:
-            assert n_initial > 0
-            self.n_initial = n_initial
-
-        # Caches for history and node best
+        # Caches expansion for history and node best
         self._cache_expand_size = 1000
 
         # history saves the history of all evaluations
@@ -75,8 +79,29 @@ class MCIV:
         self._node_best = None
         self.node_best_current_idx = -1
 
+        # dict to keep the lb/ub, gradient, and hessian for all node
+        self.node_bounds = {}
+        self._node_grad_expect = {}
+        self._node_hessian_expect = {}
+
+        # Advaced sampler for creating evenly distributed points
+        self.advanced_sampler = qmc.LatinHypercube(self.dims)
+
+        ##### Optimization related ##########
         # iterations
         self.max_iterations = max_iterations
+
+        # root is initialized to the anchor
+        # if anchor is provided
+        self.root_anchor = root
+        self.root = None
+
+        # expansion
+        if num_node_expand == "auto":
+            self.num_node_expand = 2 * self.dims + 1
+        else:
+            assert num_node_expand > 0
+            self.num_node_expand = num_node_expand
 
         # new node position
         self.dist_max = dist_max  # Max relative distance when create new node
@@ -87,15 +112,12 @@ class MCIV:
         # exploration related
         self.node_uct_improve = node_uct_improve  # C_d  for node
         self.node_uct_n_improve = node_uct_n_improve  # number of improves
+        self.node_uct_lb_coeff = node_uct_lb_coeff  # coefficient for interval lb
         self.node_uct_explore = node_uct_explore  # C_p  for node
         self.leaf_improve = leaf_improve  # C_d'' for leaf
         self.leaf_explore = leaf_explore  # C_p'' for leaf
         self.branch_explore = branch_explore  # C_d' for branch
         self.min_node_visit = 1  # minimum number of visits before expand
-
-        # Symbolic expression of the function
-        self.function_variables = function_variables
-        self.function_expression = function_expression
 
         # Learning the lower bound
         self.suggest_failed = False
@@ -114,13 +136,7 @@ class MCIV:
             suggest_by  # "root" (the root of f==lb) or "box" (within box f==lb)
         )
 
-        # dict to keep the lb/ub, gradient, and hessian for all node
-        self.node_bounds = {}
-        self._node_grad_expect = {}
-        self._node_hessian_expect = {}
-
-        # Update other parameters
-        self._box_init = None
+        ########## Update other parameters ##########
         self.set_parameters(**kwargs)
 
         return
@@ -144,11 +160,13 @@ class MCIV:
                 self.node_best_current_idx = -1
 
         if self.root is None:
-            if self.verbose >= 2:
+            if self.verbose >= 1:
                 print("Creating root node ...")
             self.create_root(self.root_anchor)
             if self.verbose >= 1:
-                print(f"  Best found value until iteration {0} is: {self.root.y} \n")
+                print(
+                    f"  Best found value until iteration {0} is: {self.root.y:.4f} \n"
+                )
 
         for tt in range(1, self.max_iterations + 1):
             if self.verbose >= 1:
@@ -156,9 +174,15 @@ class MCIV:
 
             # selection and expansion
             node = self.select()
+            if self.verbose >= 2:
+                print(f"  Selected node: {node.name}")
 
             # new samples, and new guess within the node
             y_best, x_best = self.node_exploitation(node)
+            if self.verbose >= 2:
+                print(
+                    f"  Best found point in node {node.name} is: {y_best:.4f} , {x_best}"
+                )
 
             # backpropagation is done in above step
             # # back propagation
@@ -166,7 +190,9 @@ class MCIV:
 
             # Information
             if self.verbose >= 1:
-                print(f"  Best found value until iteration {tt} is: {self.root.y} \n")
+                print(
+                    f"  Best found value until iteration {tt} is: {self.root.y:.4f} \n"
+                )
 
         return self.root.y
 
@@ -175,10 +201,10 @@ class MCIV:
         self.root = self.create_empty_node()
         self.root.is_root = True
         self.root.set_level()
-        self.root.identifier = "root"
-        self.node_bounds[self.root.identifier] = [self.lb, self.ub]
+        self.root.name = "root"
+        self.node_bounds[self.root.name] = [self.lb, self.ub]
 
-        # create root node by anchor
+        # explore the root node
         self.node_exploitation(self.root)
         return
 
@@ -196,14 +222,30 @@ class MCIV:
         ucts = []
         for child in node.children:
             fn_interv = self.node_function_interval(child)
-            uct = -child.y - self.node_uct_explore * fn_interv[0]
+
+            term1 = child.y
+            term2 = fn_interv[0]
+            term3 = np.sqrt(node.visit) / (1 + child.visit)
+
+            uct = (
+                -term1 - self.node_uct_lb_coeff * term2 + self.node_uct_explore * term3
+            )
+
+            if self.verbose >= 3:
+                print(
+                    f"  Node {child.name} has uct: {uct:.4f} =  - ({term1:.4f}) - {self.node_uct_lb_coeff} * ({term2:.4f}) + {self.node_uct_explore} * ({term3:.4f}) "
+                )
             ucts.append(uct)
 
         best = np.argmax(ucts)
+        if self.verbose >= 3:
+            print(f"  Node {node.children[best].name} is selected")
         return node.children[best]
 
     def split_box_for_children(self, node):
-        lb, ub = self.node_bounds[node.identifier]
+        lb, ub = self.node_bounds[node.name]
+        if self.verbose >= 3:
+            print(f"Box from node : {node.name} lb = {lb}, ub = {ub}")
 
         # split the box to all children
         if node.children:
@@ -224,9 +266,8 @@ class MCIV:
             # update the bounds for all children
             for ii in range(len(node.children)):
                 child = node.children[ii]
-                name = child.identifier
                 _lb, _ub = boxes[ii]
-                self.node_bounds[name] = [_lb, _ub]
+                self.node_bounds[child.name] = [_lb, _ub]
         return
 
     def backprop(self, node, x_best=None, y_best=None, iterative=True):
@@ -272,7 +313,19 @@ class MCIV:
         )
         return node
 
+    def advance_sample(self, num_samples, lb=None, ub=None):
+        # Get num_samples samples within the bounds
+        # Use more evenly distributed sampler
+        if lb is None:
+            lb = self.lb
+        if ub is None:
+            ub = self.ub
+        samples = self.sampler(n=num_samples)
+        samples = lb + (ub - lb) * samples
+        return samples
+
     def uniform_sample(self, lb=None, ub=None):
+        # Uniformly sample a point within the bounds
         if lb is None:
             lb = self.lb
         if ub is None:
@@ -407,13 +460,21 @@ class MCIV:
         return x_new
 
     def node_function_interval(self, node):
-        # Evaluate the function value interval over a input box
-        # lb/ub: list of lower/upper bounds
-        # return: function value Interval
-        lb, ub = self.node_bounds[node.identifier]
+        # Evaluate the function value interval on a node by recursive
+
+        lb, ub = self.node_bounds[node.name]
         box = self._list_to_box(lb, ub)
 
         # Compute the function value interval
+        function_interval = evaluate_function_interval(
+            self.function_variables, self.function_expression, box
+        )
+        return function_interval
+
+    def _function_interval_on_box(self, box):
+        # Compute the function value interval
+        # box: IntervalVector
+        # return: function value Interval
         function_interval = evaluate_function_interval(
             self.function_variables, self.function_expression, box
         )
@@ -466,24 +527,43 @@ class MCIV:
         return x_new
 
     def node_exploitation(self, parent):
-        # Create next level nodes by random sampling
-        parent_name = parent.identifier
-        for ii in range(self.n_initial):
-            anchor = self.uniform_sample(*self.node_bounds[parent_name])
+        # Exploit the current node for better function value:
+        # 1. Create num_node_expand nodes at the next level by random sampling
+        # 2. Guess a good point from global Hessian and neighbor gradient
+        # 3. Guess a good point from local Hessian and local gradient
+        parent_name = parent.name
+
+        # Step 1: Create num_node_expand nodes at the next level by random sampling
+
+        # # Randomly sample num_node_expand nodes
+        # for ii in range(self.num_node_expand):
+        #     anchor = self.uniform_sample(*self.node_bounds[parent.name])
+        #     # Put nodes into the child level
+        #     child = self.create_node(anchor)
+        #     child.set_parent(parent)
+        #     child.name = parent_name + "_" + f"{len(parent.children)}"
+        #     X_best = child.X
+        #     y_best = child.y
+        #     self.backprop(child, X_best, y_best)
+
+        # # Advanced sampling approach to sample num_node_expand nodes
+        anchors_all = self.advanced_sampler.random(n=self.num_node_expand)
+        for anchor in anchors_all:
             # Put nodes into the child level
             child = self.create_node(anchor)
             child.set_parent(parent)
-            child.identifier = parent_name + "_" + f"{len(parent.children)}"
+            child.name = parent_name + "_" + f"{len(parent.children)}"
             X_best = child.X
             y_best = child.y
             self.backprop(child, X_best, y_best)
 
         if self.verbose >= 2:
             print(
-                f"After creating child nodes for {parent_name}, best point: ",
-                parent.y,
+                f"After creating child nodes for {parent_name}, best point: {parent.y:.4f}  ",
                 parent.X,
             )
+
+        # Step 2. Guess a good point from global Hessian and neighbor gradient
 
         # Create a new sample by guessing a good point by neighbor fprime and global fhess
         # using newton's method for convex functions
@@ -491,16 +571,17 @@ class MCIV:
         anchor = self.guess_good(parent)
         child = self.create_node(anchor)
         child.set_parent(parent)
-        child.identifier = parent.identifier + "_" + f"{len(parent.children)}"
+        child.name = parent.name + "_" + f"{len(parent.children)}"
         X_best = child.X
         y_best = child.y
         self.backprop(child, X_best, y_best)
         if self.verbose >= 2:
             print(
-                f"New node {child.identifier} by optimizing with global Hessian and neighbor gradient: ",
-                child.y,
+                f"New node {child.name} by optimizing with global Hessian and neighbor gradient: {child.y:.4f} ",
                 child.X,
             )
+
+        # Step 3. Guess a good point from local Hessian and local gradient
 
         # Create another new sample by guessing a good point from local fprime and fhess
         # using newton's method for convex functions
@@ -508,58 +589,15 @@ class MCIV:
         anchor = self.guess_good_local(parent)
         child = self.create_node(anchor)
         child.set_parent(parent)
-        child.identifier = parent.identifier + "_" + f"{len(parent.children)}"
+        child.name = parent.name + "_" + f"{len(parent.children)}"
         X_best = child.X
         y_best = child.y
         self.backprop(child, X_best, y_best)
 
         if self.verbose >= 2:
             print(
-                f"New node {child.identifier} by optimizing with local Hessian and local gradient: ",
-                child.y,
+                f"New node {child.name} by optimizing with local Hessian and local gradient: {child.y:.4f} ",
                 child.X,
             )
 
         return parent.y, parent.X
-
-
-if __name__ == "__main__":
-    # run a test case with Ackley function
-    from .test_functions import Ackley
-
-    dims = 2
-    fn = Ackley(dims=dims)
-    lb = -10 * np.ones(dims)
-    ub = 10 * np.ones(dims)
-
-    var_exp = None
-    fn_exp = None
-    try:
-        var_exp, fn_exp = fn.expression()
-    except:
-        pass
-
-    alg = MCIV(
-        fn=fn,
-        lb=lb,
-        ub=ub,
-        function_variables=var_exp,
-        function_expression=fn_exp,
-        n_eval_local=1000,
-        lb_ignore_coeff=1e-3,
-        lb_displacement=0.1,
-    )
-
-    result_list = []
-    history_list = []
-    for _ in range(5):
-        res = alg.optimize(
-            verbose=2,
-            max_iterations=100,
-            n_initial=5,
-            node_uct_explore=1.0,
-        )
-        result_list.append(res)
-        history_list.append(alg.history)
-
-    print("Result list:", result_list)

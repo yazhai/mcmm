@@ -7,7 +7,7 @@ class SearchNodeABS:
     This class defines an abstracted node in the search model.
 
     obj = SearchNodeABS(
-                identifier = None,
+                name = None,
                 parent = None,
                 children = None,
                 possible_moves = None,
@@ -17,13 +17,13 @@ class SearchNodeABS:
 
     def __init__(
         self,
-        identifier=None,
+        name=None,
         parent=None,
         children=None,
         possible_moves=None,
         is_root=False,
     ):
-        self.identifier = identifier
+        self.name = name
 
         self.is_root = is_root
         self.parent = None
@@ -83,7 +83,7 @@ class RealVectorTreeNode(SearchNodeABS):
 
     obj = RealVectorTreeNode(
                 input=None,
-                identifier=None,
+                name=None,
                 is_root=False,
                 children=None,
                 parent=None,
@@ -109,7 +109,7 @@ class RealVectorTreeNode(SearchNodeABS):
     def __init__(
         self,
         input=None,
-        identifier=None,
+        name=None,
         is_root=False,
         children=None,
         parent=None,
@@ -118,7 +118,7 @@ class RealVectorTreeNode(SearchNodeABS):
         **kwargs,
     ):
         super().__init__(
-            identifier=identifier,
+            name=name,
             parent=parent,
             children=children,
             is_root=is_root,
@@ -145,6 +145,14 @@ class RealVectorTreeNode(SearchNodeABS):
         self.set_parameters(**kwargs)
 
         return
+
+    def __hash__(self) -> int:
+        if self.name is None:
+            return hash(0)
+        return hash(self.name)
+
+    def __repr__(self) -> str:
+        return self.name
 
     @property
     def X(self):
@@ -181,7 +189,7 @@ class RealVectorTreeNode(SearchNodeABS):
             pass
 
         # print(
-        #     f"## Temporary: computing score on node {self.identifier} : best_y = {self.y} , improves = ",
+        #     f"## Temporary: computing score on node {self.name} : best_y = {self.y} , improves = ",
         #     self.improves,
         # )
 
@@ -245,3 +253,11 @@ class RealVectorTreeNode(SearchNodeABS):
     def set_terminal(self):
         self.terminal = True
         return
+
+    def __hash__(self) -> int:
+        if self.name is None:
+            return hash(0)
+        return hash(self.name)
+
+    def __repr__(self) -> str:
+        return self.name
