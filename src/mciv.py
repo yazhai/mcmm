@@ -4,6 +4,8 @@ from typing import Any
 import numpy as np
 import nlopt
 
+from collections import defaultdict
+
 import jax.numpy as jnp
 
 # from jax import device_put, grad, jit, random, vmap
@@ -79,10 +81,21 @@ class MCIV:
         self._node_best = None
         self.node_best_current_idx = -1
 
-        # dict to keep the lb/ub, gradient, and hessian for all node
-        self.node_bounds = {}
-        self._node_grad_expect = {}
-        self._node_hessian_expect = {}
+        # dict to keep the lb/ub
+
+        # dict to save the input domain bounds for each node; node_bounds[node.name] = [lb, ub]
+        self.node_bounds = defaultdict(list)
+
+        # dict to save the lower bound of the function value for each node; node_function_interval[node.name] = [lb, ub]
+        self.node_function_interval = defaultdict(list)
+        self.node_function_interval_lb_from_child = defaultdict(lambda: None)
+
+        # dict to save the index of the children that covers the box of the parent
+        self.node_cover_children = defaultdict(list)
+
+        # dict to save the size of the box of each node
+        _default_vol = self._bound_volume(self.lb, self.ub)
+        self.node_box_size = defaultdict(lambda: _default_vol)
 
         # Advaced sampler for creating evenly distributed points
         self.advanced_sampler = qmc.LatinHypercube(self.dims)
@@ -159,6 +172,14 @@ class MCIV:
                 self._node_best = self._cache_expand()
                 self.node_best_current_idx = -1
 
+            self.node_function_interval = defaultdict(list)
+            self.node_function_interval_lb_from_child = defaultdict(lambda: None)
+            self.node_bounds = defaultdict(list)
+            self.node_cover_children = defaultdict(list)
+            self.node_box_size = defaultdict(
+                lambda: self._bound_volume(self.lb, self.ub)
+            )
+
         if self.root is None:
             if self.verbose >= 1:
                 print("Creating root node ...")
@@ -202,7 +223,7 @@ class MCIV:
         self.root.is_root = True
         self.root.set_level()
         self.root.name = "root"
-        self.node_bounds[self.root.name] = [self.lb, self.ub]
+        self.assign_box(self.root, self.lb, self.ub)
 
         # explore the root node
         self.node_exploitation(self.root)
@@ -213,15 +234,41 @@ class MCIV:
             node = self.root
 
         while node.children:
-            node = self.select_by_uct_interval(node)
+            # node = self.select_by_uct_interval(node)
+            node = self.select_by_uct_lb_boxsize(node)
 
         return node
 
-    def select_by_uct_interval(self, node):
-        self.split_box_for_children(node)
+    def select_by_uct_lb_boxsize(self, node):
         ucts = []
         for child in node.children:
-            fn_interv = self.node_function_interval(child)
+            fn_interv = self.node_function_interval[child.name]
+            lb_box_from = self.node_function_interval_lb_from_child[child.name]
+            lb_box_size = self.node_box_size[lb_box_from.name]
+
+            term1 = child.y
+            term2 = fn_interv[0]
+            term3 = lb_box_size
+
+            uct = (
+                -term1 - self.node_uct_lb_coeff * term2 - self.node_uct_explore * term3
+            )
+
+            if self.verbose >= 2:
+                print(
+                    f"  Node {child.name} has uct: {uct:.4f} =  - ({term1:.4f}) - {self.node_uct_lb_coeff} * ({term2:.4f}) - {self.node_uct_explore} * ({term3:.4f}) "
+                )
+            ucts.append(uct)
+
+        best = np.argmax(ucts)
+        if self.verbose >= 2:
+            print(f"  Node {node.children[best].name} is selected")
+        return node.children[best]
+
+    def select_by_uct_interval(self, node):
+        ucts = []
+        for child in node.children:
+            fn_interv = self.node_function_interval[child.name]
 
             term1 = child.y
             term2 = fn_interv[0]
@@ -247,16 +294,82 @@ class MCIV:
         if self.verbose >= 3:
             print(f"Box from node : {node.name} lb = {lb}, ub = {ub}")
 
-        # split the box to all children
+        # split the box to children
         if node.children:
-            # use index to make sure the order is correct
+            # find x of valid children
             xs = []
+            self.node_cover_children[node.name].clear()
+            cover_set = self.node_cover_children[node.name]
+
             for ii in range(len(node.children)):
                 child = node.children[ii]
                 _x = child.anchor
-                # Make sure the anchor is within the box
-                _x = self._clip_point(_x, lb=lb, ub=ub, clip_periodic=False)
+
+                # # # To deal with the case when the anchor is outside the box
+                # Option 1: using clipped x within the box
+                # _x = self._clip_point(_x, lb=lb, ub=ub, clip_periodic=False)
+                # cover_set_names.append(child.name)
+
+                # # Option 2: pick only samples within the box
+                if self.point_in_bound(_x, lb, ub):
+                    xs.append(_x)
+                    cover_set.append(child)
+
+            xs = np.array(xs)
+
+            # split the box by a dim
+            # split_dim = np.random.randint(0, self.dims)
+            split_dim = self.longest_dim_in_bound(lb, ub)
+            boxes = partition_space(lb, ub, xs, split_dim)
+
+            if self.verbose >= 3:
+                print("splitted box:", boxes)
+
+            # update the bounds for valid children
+            for ii, child in enumerate(cover_set):
+                _lb, _ub = boxes[ii]
+                self.assign_box(child, _lb, _ub)
+                if self.verbose >= 3:
+                    print(f"assign {child.name} lb|ub:", _lb, _ub)
+
+            # update the function interval for valid children
+            self.update_node_function_interval(node)
+        return
+
+    def split_box_for_children_with_adding(self, node):
+        lb, ub = self.node_bounds[node.name]
+        if self.verbose >= 3:
+            print(f"Box from node : {node.name} lb = {lb}, ub = {ub}")
+
+        # split the box to all children
+        if node.children:
+            # use index to make sure the order is correct
+            xs = []  # valid anchors
+            valid_anchor_indices = []
+
+            for ii, child in enumerate(node.children):
+                _x = child.anchor
+                if np.any(_x < lb) or np.any(_x > ub):
+                    # invalid anchor; ignore it
+                    print(f"Invalide anchor: {_x} for node {child.name}")
+                    continue
+                valid_anchor_indices.append(ii)
                 xs.append(_x)
+
+            # randomly add new anchors
+            num_new_anchors = len(node.children) - len(valid_anchor_indices)
+            if num_new_anchors > 0:
+                new_xs = self.advance_sample(num_new_anchors, lb, ub)
+                for _x in new_xs:
+                    child = self.create_node(_x)
+                    child.set_parent(node)
+                    child.name = f"{node.name}_{len(node.children)}"
+                    self.backprop(child)
+                    ii = node.children.index(child)
+                    valid_anchor_indices.append(ii)
+                    print(f"debug: adding new child {child.name} with index {ii}")
+                    xs.append(_x)
+
             xs = np.array(xs)
 
             # split the box; randomly choose a dimension
@@ -267,10 +380,11 @@ class MCIV:
                 print("splitted box:", boxes)
 
             # update the bounds for all children
-            for ii in range(len(node.children)):
-                child = node.children[ii]
+            for ii in range(len(valid_anchor_indices)):
+                child = node.children[valid_anchor_indices[ii]]
                 _lb, _ub = boxes[ii]
-                self.node_bounds[child.name] = [_lb, _ub]
+                self.assign_box(child, _lb, _ub)
+                print(f"debug: adding box for child {child.name}")
         return
 
     def backprop(self, node, x_best=None, y_best=None, iterative=True):
@@ -462,18 +576,6 @@ class MCIV:
         x_new = x - gradient * step_size
         return x_new
 
-    def node_function_interval(self, node):
-        # Evaluate the function value interval on a node by recursive
-
-        lb, ub = self.node_bounds[node.name]
-        box = self._list_to_box(lb, ub)
-
-        # Compute the function value interval
-        function_interval = evaluate_function_interval(
-            self.function_variables, self.function_expression, box
-        )
-        return function_interval
-
     def _function_interval_on_box(self, box):
         # Compute the function value interval
         # box: IntervalVector
@@ -529,82 +631,80 @@ class MCIV:
 
         return x_new
 
-    def node_exploitation(self, parent):
+    def node_exploitation(self, node):
         # Exploit the current node for better function value:
         # 1. Create num_node_expand nodes at the next level by random sampling
         # 2. Guess a good point from global Hessian and neighbor gradient
         # 3. Guess a good point from local Hessian and local gradient
-        parent_name = parent.name
 
         # Step 1: Create num_node_expand nodes at the next level by random sampling
 
         # # Randomly sample num_node_expand nodes
         # for ii in range(self.num_node_expand):
-        #     anchor = self.uniform_sample(*self.node_bounds[parent.name])
+        #     anchor = self.uniform_sample(*self.node_bounds[node.name])
         #     # Put nodes into the child level
         #     child = self.create_node(anchor)
-        #     child.set_parent(parent)
-        #     child.name = parent_name + "_" + f"{len(parent.children)}"
+        #     child.set_parent(node)
+        #     child.name = node_name + "_" + f"{len(node.children)}"
         #     X_best = child.X
         #     y_best = child.y
         #     self.backprop(child, X_best, y_best)
 
         # # Advanced sampling approach to sample num_node_expand nodes
-        lb, ub = self.node_bounds[parent.name]
-        anchors_all = self.advance_sample(self.num_node_expand, lb=lb, ub=ub)
-        for anchor in anchors_all:
+        lb, ub = self.node_bounds[node.name]
+        anchors_cover_set = self.advance_sample(self.num_node_expand, lb=lb, ub=ub)
+        for anchor in anchors_cover_set:
             # Put nodes into the child level
             child = self.create_node(anchor)
-            child.set_parent(parent)
-            child.name = parent_name + "_" + f"{len(parent.children)}"
-            X_best = child.X
-            y_best = child.y
-            self.backprop(child, X_best, y_best)
+            child.set_parent(node)
+            child.name = node.name + "_" + f"{len(node.children)}"
+            self.backprop(child)
+        self.split_box_for_children(node)
 
         if self.verbose >= 2:
             print(
-                f"After creating child nodes for {parent_name}, best point: {parent.y:.4f}  ",
-                parent.X,
+                f"After creating child nodes for {node.name}, best point: {node.y:.4f}  ",
+                node.X,
             )
 
         # Step 2. Guess a good point from global Hessian and neighbor gradient
 
-        # Create a new sample by guessing a good point by neighbor fprime and global fhess
-        # using newton's method for convex functions
-        # using gradient descent for concave functions
-        anchor = self.guess_good(parent)
-        child = self.create_node(anchor)
-        child.set_parent(parent)
-        child.name = parent.name + "_" + f"{len(parent.children)}"
-        X_best = child.X
-        y_best = child.y
-        self.backprop(child, X_best, y_best)
-        if self.verbose >= 2:
-            print(
-                f"New node {child.name} by optimizing with global Hessian and neighbor gradient: {child.y:.4f} ",
-                child.X,
-            )
+        # # Create a new sample by guessing a good point by neighbor fprime and global fhess
+        # # Put it under the root
+        # # using newton's method for convex functions
+        # # using gradient descent for concave functions
+        # root = self.root
+        # anchor = self.guess_good(node)
 
-        # Step 3. Guess a good point from local Hessian and local gradient
+        # if not (np.any(anchor < self.lb) or np.any(anchor > self.ub)):
+        #     child = self.create_node(anchor)
+        #     child.set_parent(root)
+        #     child.name = root.name + "_" + f"{len(root.children)}"
+        #     self.backprop(child)
+        #     if self.verbose >= 2:
+        #         print(
+        #             f"New node {child.name} by optimizing with global Hessian and neighbor gradient: {child.y:.4f} ",
+        #             child.X,
+        #         )
 
-        # Create another new sample by guessing a good point from local fprime and fhess
-        # using newton's method for convex functions
-        # using gradient descent for concave functions
-        anchor = self.guess_good_local(parent)
-        child = self.create_node(anchor)
-        child.set_parent(parent)
-        child.name = parent.name + "_" + f"{len(parent.children)}"
-        X_best = child.X
-        y_best = child.y
-        self.backprop(child, X_best, y_best)
+        # # Step 3. Guess a good point from local Hessian and local gradient
 
-        if self.verbose >= 2:
-            print(
-                f"New node {child.name} by optimizing with local Hessian and local gradient: {child.y:.4f} ",
-                child.X,
-            )
+        # # Create another new sample by guessing a good point from local fprime and fhess
+        # # using newton's method for convex functions
+        # # using gradient descent for concave functions
+        # anchor = self.guess_good_local(node)
+        # child = self.create_node(anchor)
+        # child.set_parent(root)
+        # child.name = root.name + "_" + f"{len(root.children)}"
+        # self.backprop(child)
 
-        return parent.y, parent.X
+        # if self.verbose >= 2:
+        #     print(
+        #         f"New node {child.name} by optimizing with local Hessian and local gradient: {child.y:.4f} ",
+        #         child.X,
+        #     )
+
+        return node.y, node.X
 
     def _clip_point(self, x, lb=None, ub=None, clip_periodic=None):
         if lb is None:
@@ -623,3 +723,72 @@ class MCIV:
         else:
             x = np.clip(x, lb, ub)
         return x
+
+    def assign_box(self, node, lb, ub):
+        if node.name not in self.node_bounds:
+            self.node_bounds[node.name] = (lb, ub)
+            self.node_box_size[node.name] = self._bound_volume(lb, ub)
+        else:
+            print(f"Warining: re-assigning box for node {node.name}; action not taken")
+
+    def _bounds_union(self, lbs, ubs):
+        # Union of intervals
+        # lbs: list of lower bounds
+        # ubs: list of upper bounds
+        # return: lower bound and upper bound of the union
+        lb = np.min(lbs, axis=0)
+        ub = np.max(ubs, axis=0)
+        return lb, ub
+
+    def _1dinterval_merge(self, intervals):
+        # Union of intervals (or )
+        # intervals: list or array of intervals [[lb, ub], ...]
+        # return: lower bound and upper bound of the union, and where the lb and ub are in the original list
+
+        # sort the intervals by bound
+        lb_sorted = sorted(enumerate(intervals), key=lambda x: x[1][0])
+        ub_sorted = sorted(enumerate(intervals), reverse=True, key=lambda x: x[1][1])
+
+        idx_lb, intervals_lb = lb_sorted[0]
+        idx_ub, intervals_ub = ub_sorted[0]
+        lb = intervals_lb[0]
+        ub = intervals_ub[1]
+        return [lb, ub], [idx_lb, idx_ub]
+
+    def point_in_bound(self, point, lb, ub):
+        return np.all(point >= lb) and np.any(point <= ub)
+
+    def longest_dim_in_bound(self, lb, ub):
+        # return the longest dimension of the box
+        return np.argmax(ub - lb)
+
+    def update_node_function_interval(self, node):
+        # Update the function interval of a node
+        # If the node has a covering set
+        if self.node_cover_children[node.name]:
+            child_intervals = []
+            for child in self.node_cover_children[node.name]:
+                # [lb(f(child)), ub(f(child))]
+                _interval = self.update_node_function_interval(child)
+                child_intervals.append(_interval)
+            # Merge intervals, and find where lb/ub comes from
+            function_interval, indices = self._1dinterval_merge(child_intervals)
+            lb_from_child_idx, _ = indices
+            lb_from_child = self.node_cover_children[node.name][lb_from_child_idx]
+            self.node_function_interval_lb_from_child[
+                node.name
+            ] = self.node_function_interval_lb_from_child[lb_from_child.name]
+        else:
+            # If the node does not have a covering set
+            lb, ub = self.node_bounds[node.name]
+            box = self._list_to_box(lb, ub)
+            function_interval = self._function_interval_on_box(box)
+            self.node_function_interval[node.name] = function_interval
+            # the lb is from itself
+            self.node_function_interval_lb_from_child[node.name] = node
+
+        return function_interval
+
+    def _bound_volume(self, lb, ub):
+        # return the volumn of the box
+        return np.log10(np.prod(ub - lb))

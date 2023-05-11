@@ -4,8 +4,8 @@ from src.test_functions import *
 from src.mciv import MCIV
 
 
-dims_all = [2, 10, 50, 100, 200]
-max_iterations = [20, 40, 100, 200]
+dims_all = [2, 10, 50, 100]
+max_iterations = [20, 40, 40, 40]
 node_expansions = [10, 10, 10, 10]
 
 fn_all = [Ackley, Levy, Michalewicz]
@@ -16,10 +16,8 @@ with open(export_log, "w") as f:
     f.write("function ; result ; time\n")
 
 
-for ii in range(len(dims_all)):
-    if ii < 2:
-        continue
-    for rep in range(5):
+for rep in range(5):
+    for ii in range(len(dims_all)):
         dims = dims_all[ii]
         max_iter = max_iterations[ii]
         num_node_expand = node_expansions[ii]
