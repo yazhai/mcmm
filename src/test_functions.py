@@ -1,6 +1,10 @@
 import numpy as np
 import jax.numpy as jnp
 
+import torch
+import torch.nn as nn
+import sympy
+
 
 class TestFunction:
     def __init__(self, dims: int = 2) -> None:
@@ -364,3 +368,98 @@ class Michalewicz(TestFunction):
         expression = f"-({sin_term})"
         variables = [f"x[{dims}]"]
         return variables, expression
+
+
+class NeuralNetworkOneLayer(TestFunction):
+    def __init__(self, dims: int = 2, hidden_neurons=16, state_dict=None, device='cpu') -> None:
+        super().__init__(dims)
+        self.model = nn.Sequential(
+            nn.Linear(dims, hidden_neurons),
+            nn.ReLU(),
+            nn.Linear(hidden_neurons, 1),
+        )
+
+        if state_dict is not None:
+            self.model.load_state_dict(state_dict, map_location=device)
+        
+        self.hidden_neurons = hidden_neurons
+        self.device = device
+
+    def __call__(self, x: np.ndarray) -> float:
+        assert isinstance(x, np.ndarray)
+        assert x.ndim == 1
+
+        nn_in = torch.FloatTensor(x).to(self.device)
+        with torch.no_grad():
+            nn_out = self.model(nn_in)
+        result = nn_out.item()
+
+        return result
+
+    def get_default_domain(self) -> np.ndarray:
+        return np.array([[-10, 10]] * self.dims)
+
+    def expression(self):
+        layer_idx = 2
+        layer = self.model[layer_idx]
+
+        weight = layer.weight
+        bias = layer.bias
+        width = weight.shape[1]
+
+        inter_vars = sympy.symbols(', '.join(['x[{}][{}]'.format(layer_idx, i) for i in range(width)]))
+
+        X = np.expand_dims(np.array(inter_vars), axis=1)
+        W = weight.detach().cpu().numpy()
+        b = bias.detach().cpu().numpy()
+        expression = (W @ X).squeeze(axis=1) + b
+        expression = expression.item()
+
+        layer_idx = 1
+        layer = self.model[layer_idx]
+        layer
+
+        prev_inter_vars = inter_vars
+        width = len(inter_vars)
+        inter_vars = sympy.symbols(', '.join(['x[{}][{}]'.format(layer_idx, i) for i in range(width)]))
+
+        replace_dict = {}
+        for curr_var, prev_var in zip(inter_vars, prev_inter_vars):
+            replace_dict[prev_var] = sympy.Max(curr_var, 0)
+
+        prev_expression = expression
+        for key in replace_dict:
+            expression = expression.subs(key, replace_dict[key])
+
+
+        layer_idx = 0
+        layer = self.model[layer_idx]
+
+        weight = layer.weight
+        bias = layer.bias
+        width = weight.shape[1]
+
+        prev_inter_vars = inter_vars
+        inter_vars = sympy.symbols(', '.join(['x[{}]'.format(i) for i in range(width)]))
+        if isinstance(inter_vars, sympy.Symbol):
+            inter_vars = [inter_vars]
+
+        X = np.expand_dims(np.array(inter_vars), axis=1)
+        W = weight.detach().cpu().numpy()
+        b = bias.detach().cpu().numpy()
+
+        mat_res = (W @ X).squeeze(axis=1) + b
+
+        replace_dict = {}
+        for curr_expr, prev_var in zip(mat_res, prev_inter_vars):
+            replace_dict[prev_var] = curr_expr
+
+        prev_expression = expression
+        for key in replace_dict:
+            expression = expression.subs(key, replace_dict[key])
+
+        expr_nn = str(expression).replace("Max", "max")
+
+        variables = [f"x[{self.dims}]"]
+
+        return variables, expr_nn
