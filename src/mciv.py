@@ -320,6 +320,8 @@ class MCIV:
             # split the box by a dim
             # split_dim = np.random.randint(0, self.dims)
             split_dim = self.longest_dim_in_bound(lb, ub)
+            if self.verbose >= 3:
+                print("split_dim:", split_dim)
             boxes = partition_space(lb, ub, xs, split_dim)
 
             if self.verbose >= 3:
@@ -333,59 +335,59 @@ class MCIV:
                     print(f"assign {child.name} lb|ub:", _lb, _ub)
 
             # update the function interval for valid children
-            self.update_node_function_interval(node)
+            self.assign_node_function_interval(node)
         return
 
-    def split_box_for_children_with_adding(self, node):
-        lb, ub = self.node_bounds[node.name]
-        if self.verbose >= 3:
-            print(f"Box from node : {node.name} lb = {lb}, ub = {ub}")
+    # def split_box_for_children_with_adding(self, node):
+    #     lb, ub = self.node_bounds[node.name]
+    #     if self.verbose >= 3:
+    #         print(f"Box from node : {node.name} lb = {lb}, ub = {ub}")
 
-        # split the box to all children
-        if node.children:
-            # use index to make sure the order is correct
-            xs = []  # valid anchors
-            valid_anchor_indices = []
+    #     # split the box to all children
+    #     if node.children:
+    #         # use index to make sure the order is correct
+    #         xs = []  # valid anchors
+    #         valid_anchor_indices = []
 
-            for ii, child in enumerate(node.children):
-                _x = child.anchor
-                if np.any(_x < lb) or np.any(_x > ub):
-                    # invalid anchor; ignore it
-                    print(f"Invalide anchor: {_x} for node {child.name}")
-                    continue
-                valid_anchor_indices.append(ii)
-                xs.append(_x)
+    #         for ii, child in enumerate(node.children):
+    #             _x = child.anchor
+    #             if np.any(_x < lb) or np.any(_x > ub):
+    #                 # invalid anchor; ignore it
+    #                 print(f"Invalide anchor: {_x} for node {child.name}")
+    #                 continue
+    #             valid_anchor_indices.append(ii)
+    #             xs.append(_x)
 
-            # randomly add new anchors
-            num_new_anchors = len(node.children) - len(valid_anchor_indices)
-            if num_new_anchors > 0:
-                new_xs = self.advance_sample(num_new_anchors, lb, ub)
-                for _x in new_xs:
-                    child = self.create_node(_x)
-                    child.set_parent(node)
-                    child.name = f"{node.name}_{len(node.children)}"
-                    self.backprop(child)
-                    ii = node.children.index(child)
-                    valid_anchor_indices.append(ii)
-                    print(f"debug: adding new child {child.name} with index {ii}")
-                    xs.append(_x)
+    #         # randomly add new anchors
+    #         num_new_anchors = len(node.children) - len(valid_anchor_indices)
+    #         if num_new_anchors > 0:
+    #             new_xs = self.advance_sample(num_new_anchors, lb, ub)
+    #             for _x in new_xs:
+    #                 child = self.create_node(_x)
+    #                 child.set_parent(node)
+    #                 child.name = f"{node.name}_{len(node.children)}"
+    #                 self.backprop(child)
+    #                 ii = node.children.index(child)
+    #                 valid_anchor_indices.append(ii)
+    #                 print(f"debug: adding new child {child.name} with index {ii}")
+    #                 xs.append(_x)
 
-            xs = np.array(xs)
+    #         xs = np.array(xs)
 
-            # split the box; randomly choose a dimension
-            split_dim = np.random.randint(0, self.dims)
-            boxes = partition_space(lb, ub, xs, split_dim)
+    #         # split the box; randomly choose a dimension
+    #         split_dim = np.random.randint(0, self.dims)
+    #         boxes = partition_space(lb, ub, xs, split_dim)
 
-            if self.verbose >= 3:
-                print("splitted box:", boxes)
+    #         if self.verbose >= 3:
+    #             print("splitted box:", boxes)
 
-            # update the bounds for all children
-            for ii in range(len(valid_anchor_indices)):
-                child = node.children[valid_anchor_indices[ii]]
-                _lb, _ub = boxes[ii]
-                self.assign_box(child, _lb, _ub)
-                print(f"debug: adding box for child {child.name}")
-        return
+    #         # update the bounds for all children
+    #         for ii in range(len(valid_anchor_indices)):
+    #             child = node.children[valid_anchor_indices[ii]]
+    #             _lb, _ub = boxes[ii]
+    #             self.assign_box(child, _lb, _ub)
+    #             print(f"debug: adding box for child {child.name}")
+    #     return
 
     def backprop(self, node, x_best=None, y_best=None, iterative=True):
         curr_node = node
@@ -594,9 +596,13 @@ class MCIV:
 
         x_new = np.zeros(self.dims)
 
-        mask_convex = hessian >= 0
+        mask_convex = hessian > 0
         x_new[mask_convex] = x_new_nt[mask_convex]
         x_new[~mask_convex] = x_new_gd[~mask_convex]
+
+        # Check if the new point is valid
+        mask_invalid = np.isfinite(x_new)
+        x_new[mask_invalid] = x[mask_invalid]
 
         return x_new
 
@@ -659,6 +665,9 @@ class MCIV:
             child.set_parent(node)
             child.name = node.name + "_" + f"{len(node.children)}"
             self.backprop(child)
+            if self.verbose >= 3:
+                print(f"Advanced sampling for parent {node.name} at :", child.X)
+        # Assign boxes; evaluate function intervals and find box size with lb
         self.split_box_for_children(node)
 
         if self.verbose >= 2:
@@ -669,40 +678,66 @@ class MCIV:
 
         # Step 2. Guess a good point from global Hessian and neighbor gradient
 
-        # # Create a new sample by guessing a good point by neighbor fprime and global fhess
-        # # Put it under the root
-        # # using newton's method for convex functions
-        # # using gradient descent for concave functions
-        # root = self.root
-        # anchor = self.guess_good(node)
+        # Create a new sample by guessing a good point by neighbor fprime and global fhess
+        # Put it under the parent = root
+        # using newton's method for convex functions
+        # using gradient descent for concave functions
+        anchor = self.guess_good(node)
+        anchor = self._clip_point(anchor)
 
-        # if not (np.any(anchor < self.lb) or np.any(anchor > self.ub)):
-        #     child = self.create_node(anchor)
-        #     child.set_parent(root)
-        #     child.name = root.name + "_" + f"{len(root.children)}"
-        #     self.backprop(child)
-        #     if self.verbose >= 2:
-        #         print(
-        #             f"New node {child.name} by optimizing with global Hessian and neighbor gradient: {child.y:.4f} ",
-        #             child.X,
-        #         )
+        parent = self.root
+        child = self.create_node(anchor)
+        child.set_parent(parent)
+        child.name = parent.name + "_" + f"{len(parent.children)}"
+        self.backprop(child)
 
-        # # Step 3. Guess a good point from local Hessian and local gradient
+        # Assign box for the new node
+        lb, ub = self.node_bounds[parent.name]
+        dist = 0.5 * (ub - lb)
+        lb = anchor - dist
+        ub = anchor + dist
+        lb = np.clip(lb, self.lb, self.ub)
+        ub = np.clip(ub, self.lb, self.ub)
+        self.assign_box(child, lb, ub)
+        # Evaluate function interval
+        self.assign_node_function_interval(child)
 
-        # # Create another new sample by guessing a good point from local fprime and fhess
-        # # using newton's method for convex functions
-        # # using gradient descent for concave functions
-        # anchor = self.guess_good_local(node)
-        # child = self.create_node(anchor)
-        # child.set_parent(root)
-        # child.name = root.name + "_" + f"{len(root.children)}"
-        # self.backprop(child)
+        if self.verbose >= 2:
+            print(
+                f"New node {child.name} by optimizing with global Hessian and neighbor gradient: {child.y:.4f} ",
+                child.X,
+            )
 
-        # if self.verbose >= 2:
-        #     print(
-        #         f"New node {child.name} by optimizing with local Hessian and local gradient: {child.y:.4f} ",
-        #         child.X,
-        #     )
+        # Step 3. Guess a good point from local Hessian and local gradient
+
+        # Create another new sample by guessing a good point from local fprime and fhess
+        # using newton's method for convex functions
+        # using gradient descent for concave functions
+        anchor = self.guess_good_local(node)
+        anchor = self._clip_point(anchor)
+
+        parent = self.root
+        child = self.create_node(anchor)
+        child.set_parent(parent)
+        child.name = parent.name + "_" + f"{len(parent.children)}"
+        self.backprop(child)
+
+        # Assign box for the new node
+        lb, ub = self.node_bounds[parent.name]
+        dist = 0.5 * (ub - lb)
+        lb = anchor - dist
+        ub = anchor + dist
+        lb = np.clip(lb, self.lb, self.ub)
+        ub = np.clip(ub, self.lb, self.ub)
+        self.assign_box(child, lb, ub)
+        # Evaluate function interval
+        self.assign_node_function_interval(child)
+
+        if self.verbose >= 2:
+            print(
+                f"New node {child.name} by optimizing with local Hessian and local gradient: {child.y:.4f} ",
+                child.X,
+            )
 
         return node.y, node.X
 
@@ -710,7 +745,7 @@ class MCIV:
         if lb is None:
             lb = self.lb
         if ub is None:
-            ub = self.nb
+            ub = self.ub
         if clip_periodic is None:
             clip_periodic = self.clip_periodic
         if clip_periodic:
@@ -762,14 +797,14 @@ class MCIV:
         # return the longest dimension of the box
         return np.argmax(ub - lb)
 
-    def update_node_function_interval(self, node):
+    def assign_node_function_interval(self, node):
         # Update the function interval of a node
         # If the node has a covering set
         if self.node_cover_children[node.name]:
             child_intervals = []
             for child in self.node_cover_children[node.name]:
                 # [lb(f(child)), ub(f(child))]
-                _interval = self.update_node_function_interval(child)
+                _interval = self.assign_node_function_interval(child)
                 child_intervals.append(_interval)
             # Merge intervals, and find where lb/ub comes from
             function_interval, indices = self._1dinterval_merge(child_intervals)
