@@ -3,4 +3,6 @@ jax
 scipy
 scikit-learn
 pyibex
+torch 
+tqdm
 

@@ -3,8 +3,6 @@ from typing import Any
 
 import numpy as np
 
-# import nlopt
-
 from collections import defaultdict
 
 import jax.numpy as jnp
@@ -12,6 +10,7 @@ import jax.numpy as jnp
 # from jax import device_put, grad, jit, random, vmap
 from jax import grad as jax_grad
 from jax import hessian as jax_hessian
+from jax import jit as jax_jit
 
 from scipy.stats import qmc
 from scipy.optimize import minimize as scipy_minimize
@@ -98,6 +97,7 @@ class MCIV:
         self._interval_global = (
             None  # global function interval on the whole input domain
         )
+        self._interval_max_score = 100.0  # max score of the interval when f(x) = lb
 
         # dict to save the index of the children that covers the box of the parent
         self.node_cover_children = defaultdict(list)
@@ -167,6 +167,11 @@ class MCIV:
             self._init_local_opt(self.n_opt_local, **kwargs)
 
         ########## Update other parameters ##########
+
+        # jit the function gradient and hessian
+        self._grad_jit = jax_jit(jax_grad(self.fn))
+        self._hessian_jit = jax_jit(jax_hessian(self.fn))
+
         self.set_parameters(**kwargs)
 
         return
@@ -272,21 +277,25 @@ class MCIV:
             # term3 = lb_box_size
 
             # # Use normalized value
-            term1 = self.normalize_value(child.y)
-            term2 = self.normalize_value(fn_interv[0])
-            term3 = self.normalize_volume(lb_box_size)
-            term4 = np.sqrt(np.log(node.visit) / (1 + child.visit))
+            sample_score = self._interval_max_score * (-self.normalize_value(child.y))
+            interv_score = self._interval_max_score * (
+                -self.normalize_value(fn_interv[0])
+            )
+            volume_score = self._interval_max_score * (
+                1 - self.normalize_volume(lb_box_size)
+            )
+            exploration_score = np.sqrt(np.log(node.visit) / (1 + child.visit))
 
             uct = (
-                -term1
-                - self.node_uct_lb_coeff * term2
-                - self.node_uct_box_coeff * term3
-                + self.node_uct_explore * term4
+                sample_score
+                + self.node_uct_lb_coeff * interv_score
+                + self.node_uct_box_coeff * volume_score
+                + self.node_uct_explore * exploration_score
             )
 
             if self.verbose >= 2:
                 print(
-                    f"  Node {child.name} has uct: {uct:.4f} =  - ({term1:.4f}) - {self.node_uct_lb_coeff} * ({term2:.4f}) - {self.node_uct_box_coeff} * ({term3:.4f}) + {self.node_uct_explore} * ({term4:.4f})"
+                    f"  Node {child.name} has uct: {uct:.4f} =  ({sample_score:.4f}) + {self.node_uct_lb_coeff} * ({interv_score:.4f}) + {self.node_uct_box_coeff} * ({volume_score:.4f}) + {self.node_uct_explore} * ({exploration_score:.4f})"
                 )
             ucts.append(uct)
 
@@ -600,18 +609,18 @@ class MCIV:
         return fprime, fhess_diag
 
     def _grad(self, x):
-        return jax_grad(self.fn)(x)
+        try:
+            return self._grad_jit(x)
+        except:
+            print(" Failed to use jit grad, use grad instead")
+            return jax_grad(self.fn)(x)
 
     def _hessian(self, x):
-        # # returns only the diagonal of the hessian
-        # dfdx = self._grad(x)
-        # hessian_diagonal = jnp.zeros(self.dims)
-        # for ii in range(self.dims):
-        #     hessian_diagonal[ii] = jax_grad(lambda x: dfdx[ii])(x)[ii]
-        # return hessian_diagonal
-
-        # returns the full hessian
-        return jax_hessian(self.fn)(x)
+        try:
+            return self._hessian_jit(x)
+        except:
+            print(" Failed to use jit hessian, use hessian instead")
+            return jax_hessian(self.fn)(x)
 
     def _newton_step(self, x, gradinet, hessian_diagonal):
         x_new = x - gradinet / hessian_diagonal
@@ -830,11 +839,9 @@ class MCIV:
         if self._interval_global[0] == self._interval_global[1]:
             return 0
         else:
-            # default range is [0, 100]
-            return (
-                100.0
-                * (value - self._interval_global[0])
-                / (self._interval_global[1] - self._interval_global[0])
+            # default range is [0, 1]
+            return (value - self._interval_global[0]) / (
+                self._interval_global[1] - self._interval_global[0]
             )
 
     def _bounds_union(self, lbs, ubs):
@@ -854,12 +861,12 @@ class MCIV:
         if self._global_volume is None:
             self._global_volume = self._bound_volume(self.lb, self.ub)
 
-        # default range is [0, 100]
-        # if the volume ratio is (0.5)^dims, we set the value to 50
+        # default range is [0, 1.0]
+        # if the volume ratio is (0.5)^dims, we set the value to 0.5
         ratio = vol / self._global_volume
         value = np.exp(np.log(ratio) / self.dims)
 
-        return value * 1.0
+        return value
 
     def _1dinterval_merge(self, intervals):
         # Union of intervals (or )
