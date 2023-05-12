@@ -14,6 +14,7 @@ from jax import grad as jax_grad
 from jax import hessian as jax_hessian
 
 from scipy.stats import qmc
+from scipy.optimize import minimize as scipy_minimize
 
 from pyibex import Interval, IntervalVector
 
@@ -33,7 +34,7 @@ class MCIV:
         verbose=0,  # Run-time information level, 0: no info, 1: summary, 2: run time info, 3: entire tree info
         batch_size=1,  # Number of function evaluations at the same time
         max_iterations=10,  # Number of total iterations
-        n_eval_local=10,  # Number of allowed function calls in local opt in every iteration
+        n_opt_local=0,  # Number of allowed function calls in local opt in every iteration
         num_node_expand="auto",  # Number of initial points
         dist_max=0.75,  # Max relative distance when create new node
         dist_min=0.25,  # Min relative distance when create new node
@@ -159,6 +160,12 @@ class MCIV:
             suggest_by  # "root" (the root of f==lb) or "box" (within box f==lb)
         )
 
+        # local optimization
+        self.local_optimizer = None
+        self.n_opt_local = n_opt_local
+        if self.n_opt_local > 0:
+            self._init_local_opt(self.n_opt_local, **kwargs)
+
         ########## Update other parameters ##########
         self.set_parameters(**kwargs)
 
@@ -172,6 +179,9 @@ class MCIV:
 
     def optimize(self, restart=False, **kwargs):
         self.set_parameters(**kwargs)
+
+        if self.n_opt_local > 0:
+            self._init_local_opt(self.n_opt_local)
 
         if not restart:
             self.root = None
@@ -593,6 +603,14 @@ class MCIV:
         return jax_grad(self.fn)(x)
 
     def _hessian(self, x):
+        # # returns only the diagonal of the hessian
+        # dfdx = self._grad(x)
+        # hessian_diagonal = jnp.zeros(self.dims)
+        # for ii in range(self.dims):
+        #     hessian_diagonal[ii] = jax_grad(lambda x: dfdx[ii])(x)[ii]
+        # return hessian_diagonal
+
+        # returns the full hessian
         return jax_hessian(self.fn)(x)
 
     def _newton_step(self, x, gradinet, hessian_diagonal):
@@ -689,6 +707,11 @@ class MCIV:
             child = self.create_node(anchor)
             child.set_parent(node)
             child.name = node.name + "_" + f"{len(node.children)}"
+
+            # Local optimization
+            if self.local_optimizer is not None:
+                self.node_local_optimize(child)
+
             self.backprop(child)
             if self.verbose >= 3:
                 print(f"Advanced sampling for parent {node.name} at :", child.X)
@@ -714,6 +737,10 @@ class MCIV:
         child = self.create_node(anchor)
         child.set_parent(parent)
         child.name = parent.name + "_" + f"{len(parent.children)}"
+
+        # Local optimization
+        if self.local_optimizer is not None:
+            self.node_local_optimize(child)
         self.backprop(child)
 
         # Assign box for the new node
@@ -745,6 +772,10 @@ class MCIV:
         child = self.create_node(anchor)
         child.set_parent(parent)
         child.name = parent.name + "_" + f"{len(parent.children)}"
+
+        # Local optimization
+        if self.local_optimizer is not None:
+            self.node_local_optimize(child)
         self.backprop(child)
 
         # Assign box for the new node
@@ -910,4 +941,35 @@ class MCIV:
         while parent:
             self.update_node_function_interval_from_cover_set(parent)
             parent = parent.parent
+        return
+
+    def _init_local_opt(self, n_opt_local, **kwargs):
+        self.local_optimizer = scipy_minimize
+        self.local_opt_kwargs = {
+            "method": "BFGS",
+            "jac": self._grad,
+            "options": {"maxiter": n_opt_local, "disp": False},
+        }
+
+    def local_opt_from(self, x0):
+        result_x = x0
+        result_y = self.fn(x0)
+        if self.local_optimizer is not None:
+            res = self.local_optimizer(self.fn, x0, **self.local_opt_kwargs)
+            result_x = res.x
+            result_y = res.fun
+        return result_y, result_x
+
+    def node_local_optimize(self, node):
+        x0 = node.X
+        result_y, result_x = self.local_opt_from(x0)
+        if self.verbose >= 2:
+            print(f" run local optimization on node  {node.name}:")
+            print(f"  y0 -> y*: {node.y} -> {result_y}")
+            print(f"  x0: {x0}")
+            print(f"  x*: {result_x}")
+
+        # update the node
+        node.update_stat(result_y, result_x)
+        node.visit_once()
         return
