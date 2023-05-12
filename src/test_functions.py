@@ -370,31 +370,55 @@ class Michalewicz(TestFunction):
         return variables, expression
 
 
+
+
 class NeuralNetworkOneLayer(TestFunction):
-    def __init__(self, dims: int = 2, hidden_neurons=16, state_dict=None, device='cpu') -> None:
+    def __init__(self, dims: int = 2, domain=None, hidden_dims=16, state_dict=None, device='cpu') -> None:
         super().__init__(dims)
         self.model = nn.Sequential(
-            nn.Linear(dims, hidden_neurons),
+            nn.Linear(dims, hidden_dims),
             nn.ReLU(),
-            nn.Linear(hidden_neurons, 1),
+            nn.Linear(hidden_dims, 1),
         )
 
+        self.model.to(device)
+
         if state_dict is not None:
-            self.model.load_state_dict(state_dict, map_location=device)
+            self.model.load_state_dict(state_dict)
         
-        self.hidden_neurons = hidden_neurons
+        
+        self.hidden_dims = hidden_dims
         self.device = device
 
+        if domain is None:
+            domain = self.get_default_domain()
+        
+        self.domain = domain
+
     def __call__(self, x: np.ndarray) -> float:
-        assert isinstance(x, np.ndarray)
+        assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
         assert x.ndim == 1
 
-        nn_in = torch.FloatTensor(x).to(self.device)
-        with torch.no_grad():
-            nn_out = self.model(nn_in)
-        result = nn_out.item()
+        # nn_in = torch.FloatTensor(x).to(self.device)
+        # with torch.no_grad():
+        #     nn_out = self.model(nn_in)
+        # result = nn_out.item()
+
+        # return result
+
+        x = jnp.expand_dims(x, axis=1)
+        w0, b0 = [mat.detach().cpu().numpy() for mat in [self.model[0].weight, self.model[0].bias]]
+        w0, b0 = jnp.array(w0), jnp.array(b0)
+        x = jnp.dot(w0, x) + jnp.expand_dims(b0, axis=1)
+        x = jnp.maximum(0, x)
+        w1, b1 = [mat.detach().cpu().numpy() for mat in [self.model[2].weight, self.model[2].bias]]
+        w1, b1 = jnp.array(w1), jnp.array(b1)
+        x = jnp.dot(w1, x) + jnp.expand_dims(b1, axis=1)
+
+        result = x[0][0]
 
         return result
+
 
     def get_default_domain(self) -> np.ndarray:
         return np.array([[-10, 10]] * self.dims)
@@ -463,3 +487,29 @@ class NeuralNetworkOneLayer(TestFunction):
         variables = [f"x[{self.dims}]"]
 
         return variables, expr_nn
+
+
+class NeuralNetworkOneLayerTrained(NeuralNetworkOneLayer):
+    def __init__(self, model_path, device='cpu'):
+        import os
+        assert os.path.exists(model_path), f"Model path {model_path} does not exist"
+
+        model_info = torch.load(model_path, map_location=device)
+        state_dict = model_info['state_dict']
+        input_dims = model_info['input_dims']
+        hidden_dims = model_info['hidden_dims']
+        bounds = model_info['bounds']
+
+        super().__init__(
+            dims=input_dims, 
+            domain=bounds, 
+            hidden_dims=hidden_dims, 
+            state_dict=state_dict, 
+            device=device
+        )
+    
+    def get_default_domain(self) -> np.ndarray:
+        return self.domain
+
+
+
