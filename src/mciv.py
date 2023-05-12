@@ -52,7 +52,7 @@ class MCIV:
         suggest_by="root",  # "root" (the root of f==lb) or "box" (within box f==lb)
         **kwargs,
     ):
-        # function
+        # function, input domain, and dimension
         self.fn = fn
         if not isinstance(lb, np.ndarray):
             lb = np.array(lb)
@@ -94,13 +94,16 @@ class MCIV:
         # dict to save the lower bound of the function value for each node; node_interval[node.name] = [lb(f(node)), ub(f(node))]
         self.node_interval = defaultdict(list)
         self.node_interval_lb_from_child = defaultdict(lambda: None)
+        self._interval_global = (
+            None  # global function interval on the whole input domain
+        )
 
         # dict to save the index of the children that covers the box of the parent
         self.node_cover_children = defaultdict(list)
 
         # dict to save the size of the box of each node
-        _default_vol = self._bound_volume(self.lb, self.ub)
-        self.node_box_size = defaultdict(lambda: _default_vol)
+        self._global_volume = self._bound_volume(self.lb, self.ub)
+        self.node_box_size = defaultdict(lambda: self._global_volume)
 
         # Advaced sampler for creating evenly distributed points
         self.advanced_sampler = qmc.LatinHypercube(self.dims)
@@ -253,9 +256,15 @@ class MCIV:
             lb_box_from = self.node_interval_lb_from_child[child.name]
             lb_box_size = self.node_box_size[lb_box_from.name]
 
-            term1 = child.y
-            term2 = fn_interv[0]
-            term3 = lb_box_size
+            # # Use original value
+            # term1 = child.y
+            # term2 = fn_interv[0]
+            # term3 = lb_box_size
+
+            # # Use normalized value
+            term1 = self.normalize_value(child.y)
+            term2 = self.normalize_value(fn_interv[0])
+            term3 = self.normalize_volume(lb_box_size)
             term4 = np.sqrt(np.log(node.visit) / (1 + child.visit))
 
             uct = (
@@ -782,6 +791,21 @@ class MCIV:
         else:
             print(f"Warining: re-assigning box for node {node.name}; action not taken")
 
+    def normalize_value(self, value):
+        if self._interval_global is None:
+            _box = self._list_to_box(self.lb, self.ub)
+            self._interval_global = self._function_interval_on_box(_box)
+
+        if self._interval_global[0] == self._interval_global[1]:
+            return 0
+        else:
+            # default range is [0, 100]
+            return (
+                100.0
+                * (value - self._interval_global[0])
+                / (self._interval_global[1] - self._interval_global[0])
+            )
+
     def _bounds_union(self, lbs, ubs):
         # Union of intervals
         # lbs: list of lower bounds
@@ -794,6 +818,17 @@ class MCIV:
     def _bound_volume(self, lb, ub):
         # return the volumn of the box
         return np.log10(np.prod(ub - lb))
+
+    def normalize_volume(self, vol):
+        if self._global_volume is None:
+            self._global_volume = self._bound_volume(self.lb, self.ub)
+
+        # default range is [0, 100]
+        # if the volume ratio is (0.5)^dims, we set the value to 50
+        ratio = vol / self._global_volume
+        value = np.exp(np.log(ratio) / self.dims)
+
+        return value * 1.0
 
     def _1dinterval_merge(self, intervals):
         # Union of intervals (or )
