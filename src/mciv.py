@@ -2,7 +2,8 @@ import copy
 from typing import Any
 
 import numpy as np
-import nlopt
+
+# import nlopt
 
 from collections import defaultdict
 
@@ -41,6 +42,7 @@ class MCIV:
         node_uct_improve=0.0,  # C_d  for node
         node_uct_n_improve=0,  # number of improves
         node_uct_lb_coeff=1.0,  # coefficient for interval lb
+        node_uct_box_coeff=1.0,  # coefficient for box size
         node_uct_explore=1.0,  # C_p  for node
         leaf_improve=100.0,  # C_d'' for leaf
         leaf_explore=10.0,  # C_p'' for leaf
@@ -81,14 +83,17 @@ class MCIV:
         self._node_best = None
         self.node_best_current_idx = -1
 
-        # dict to keep the lb/ub
+        # Nomenclature:
+        # `bounds` refers to the input domain with the form of [[lb1, lb2, ...], [ub1, ub2, ...] ]
+        # `box` refers to the input domain with the form of [[lb1, ub1], [lb2, ub2], ..., [lbn, ubn]]
+        # `interval` refers to the output range of the function with the form of [lb, ub] (since it is a scalar function)
 
         # dict to save the input domain bounds for each node; node_bounds[node.name] = [lb, ub]
         self.node_bounds = defaultdict(list)
 
-        # dict to save the lower bound of the function value for each node; node_function_interval[node.name] = [lb, ub]
-        self.node_function_interval = defaultdict(list)
-        self.node_function_interval_lb_from_child = defaultdict(lambda: None)
+        # dict to save the lower bound of the function value for each node; node_interval[node.name] = [lb(f(node)), ub(f(node))]
+        self.node_interval = defaultdict(list)
+        self.node_interval_lb_from_child = defaultdict(lambda: None)
 
         # dict to save the index of the children that covers the box of the parent
         self.node_cover_children = defaultdict(list)
@@ -126,6 +131,8 @@ class MCIV:
         self.node_uct_improve = node_uct_improve  # C_d  for node
         self.node_uct_n_improve = node_uct_n_improve  # number of improves
         self.node_uct_lb_coeff = node_uct_lb_coeff  # coefficient for interval lb
+        self.node_uct_box_coeff = node_uct_box_coeff  # coefficient for box size
+
         self.node_uct_explore = node_uct_explore  # C_p  for node
         self.leaf_improve = leaf_improve  # C_d'' for leaf
         self.leaf_explore = leaf_explore  # C_p'' for leaf
@@ -172,8 +179,8 @@ class MCIV:
                 self._node_best = self._cache_expand()
                 self.node_best_current_idx = -1
 
-            self.node_function_interval = defaultdict(list)
-            self.node_function_interval_lb_from_child = defaultdict(lambda: None)
+            self.node_interval = defaultdict(list)
+            self.node_interval_lb_from_child = defaultdict(lambda: None)
             self.node_bounds = defaultdict(list)
             self.node_cover_children = defaultdict(list)
             self.node_box_size = defaultdict(
@@ -242,21 +249,25 @@ class MCIV:
     def select_by_uct_lb_boxsize(self, node):
         ucts = []
         for child in node.children:
-            fn_interv = self.node_function_interval[child.name]
-            lb_box_from = self.node_function_interval_lb_from_child[child.name]
+            fn_interv = self.node_interval[child.name]
+            lb_box_from = self.node_interval_lb_from_child[child.name]
             lb_box_size = self.node_box_size[lb_box_from.name]
 
             term1 = child.y
             term2 = fn_interv[0]
             term3 = lb_box_size
+            term4 = np.sqrt(np.log(node.visit) / (1 + child.visit))
 
             uct = (
-                -term1 - self.node_uct_lb_coeff * term2 - self.node_uct_explore * term3
+                -term1
+                - self.node_uct_lb_coeff * term2
+                - self.node_uct_box_coeff * term3
+                + self.node_uct_explore * term4
             )
 
             if self.verbose >= 2:
                 print(
-                    f"  Node {child.name} has uct: {uct:.4f} =  - ({term1:.4f}) - {self.node_uct_lb_coeff} * ({term2:.4f}) - {self.node_uct_explore} * ({term3:.4f}) "
+                    f"  Node {child.name} has uct: {uct:.4f} =  - ({term1:.4f}) - {self.node_uct_lb_coeff} * ({term2:.4f}) - {self.node_uct_box_coeff} * ({term3:.4f}) + {self.node_uct_explore} * ({term4:.4f})"
                 )
             ucts.append(uct)
 
@@ -268,7 +279,7 @@ class MCIV:
     def select_by_uct_interval(self, node):
         ucts = []
         for child in node.children:
-            fn_interv = self.node_function_interval[child.name]
+            fn_interv = self.node_interval[child.name]
 
             term1 = child.y
             term2 = fn_interv[0]
@@ -331,11 +342,16 @@ class MCIV:
             for ii, child in enumerate(cover_set):
                 _lb, _ub = boxes[ii]
                 self.assign_box(child, _lb, _ub)
+                self.evaluate_node_function_interval(child)
                 if self.verbose >= 3:
                     print(f"assign {child.name} lb|ub:", _lb, _ub)
+                    print(
+                        f"assign {child.name} fn_interv:",
+                        self.node_interval[child.name],
+                    )
 
             # update the function interval for valid children
-            self.assign_node_function_interval(node)
+            self.backprop_interval_from_leaf(cover_set[0])
         return
 
     # def split_box_for_children_with_adding(self, node):
@@ -692,7 +708,7 @@ class MCIV:
         self.backprop(child)
 
         # Assign box for the new node
-        lb, ub = self.node_bounds[parent.name]
+        lb, ub = self.node_bounds[node.name]
         dist = 0.5 * (ub - lb)
         lb = anchor - dist
         ub = anchor + dist
@@ -700,7 +716,7 @@ class MCIV:
         ub = np.clip(ub, self.lb, self.ub)
         self.assign_box(child, lb, ub)
         # Evaluate function interval
-        self.assign_node_function_interval(child)
+        self.evaluate_node_function_interval(child)
 
         if self.verbose >= 2:
             print(
@@ -723,7 +739,7 @@ class MCIV:
         self.backprop(child)
 
         # Assign box for the new node
-        lb, ub = self.node_bounds[parent.name]
+        lb, ub = self.node_bounds[node.name]
         dist = 0.5 * (ub - lb)
         lb = anchor - dist
         ub = anchor + dist
@@ -731,7 +747,7 @@ class MCIV:
         ub = np.clip(ub, self.lb, self.ub)
         self.assign_box(child, lb, ub)
         # Evaluate function interval
-        self.assign_node_function_interval(child)
+        self.evaluate_node_function_interval(child)
 
         if self.verbose >= 2:
             print(
@@ -775,6 +791,10 @@ class MCIV:
         ub = np.max(ubs, axis=0)
         return lb, ub
 
+    def _bound_volume(self, lb, ub):
+        # return the volumn of the box
+        return np.log10(np.prod(ub - lb))
+
     def _1dinterval_merge(self, intervals):
         # Union of intervals (or )
         # intervals: list or array of intervals [[lb, ub], ...]
@@ -797,33 +817,62 @@ class MCIV:
         # return the longest dimension of the box
         return np.argmax(ub - lb)
 
-    def assign_node_function_interval(self, node):
+    def evaluate_node_function_interval(self, node):
         # Update the function interval of a node
-        # If the node has a covering set
-        if self.node_cover_children[node.name]:
-            child_intervals = []
-            for child in self.node_cover_children[node.name]:
-                # [lb(f(child)), ub(f(child))]
-                _interval = self.assign_node_function_interval(child)
-                child_intervals.append(_interval)
-            # Merge intervals, and find where lb/ub comes from
-            function_interval, indices = self._1dinterval_merge(child_intervals)
-            lb_from_child_idx, _ = indices
-            lb_from_child = self.node_cover_children[node.name][lb_from_child_idx]
-            self.node_function_interval_lb_from_child[
-                node.name
-            ] = self.node_function_interval_lb_from_child[lb_from_child.name]
-        else:
-            # If the node does not have a covering set
-            lb, ub = self.node_bounds[node.name]
-            box = self._list_to_box(lb, ub)
-            function_interval = self._function_interval_on_box(box)
-            self.node_function_interval[node.name] = function_interval
-            # the lb is from itself
-            self.node_function_interval_lb_from_child[node.name] = node
+        # This function is called when the node is created or the node's box is updated
+        lb, ub = self.node_bounds[node.name]
+        box = self._list_to_box(lb, ub)
+        function_interval = self._function_interval_on_box(box)
+        self.node_interval[node.name] = function_interval
+
+        # the lb is from itself; its parent may refer to this node as where the lb is from
+        self.node_interval_lb_from_child[node.name] = node
 
         return function_interval
 
-    def _bound_volume(self, lb, ub):
-        # return the volumn of the box
-        return np.log10(np.prod(ub - lb))
+    def update_node_function_interval_from_cover_set(self, node):
+        # Update the function interval of this node
+        # from the function intervals in its covering set
+
+        # no cover set found
+        if not self.node_cover_children:
+            return
+
+        # no function intervals for all children in cover set
+        for child in self.node_cover_children[node.name]:
+            if not self.node_interval[child.name]:
+                return
+
+        # all children in cover set have function intervals
+        child_intervals = []
+        for child in self.node_cover_children[node.name]:
+            # [lb(f(child)), ub(f(child))]
+            _interval = self.node_interval[child.name]
+            child_intervals.append(_interval)
+
+        # Merge intervals, and find where lb/ub comes from
+        function_interval, indices = self._1dinterval_merge(child_intervals)
+        lb_from_child_idx, _ = indices
+        lb_from_child = self.node_cover_children[node.name][lb_from_child_idx]
+        self.node_interval_lb_from_child[node.name] = self.node_interval_lb_from_child[
+            lb_from_child.name
+        ]
+
+        # Update the function interval of this node
+        self.node_interval[node.name] = function_interval
+
+        return
+
+    def backprop_interval_from_leaf(self, node):
+        if node.children:
+            if self.verbose >= 3:
+                print(
+                    f"Warning: calling backprop interval from non-leaf node {node.name}"
+                )
+            return
+
+        parent = node.parent
+        while parent:
+            self.update_node_function_interval_from_cover_set(parent)
+            parent = parent.parent
+        return
