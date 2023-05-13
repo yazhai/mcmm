@@ -12,8 +12,24 @@ def mciv_test(config_file):
     config = json.loads(open(config_file).read())
 
     # interpret the config file
-    fn_class = eval(config["objective"]["function"])
-    dims = config.get("objective", {}).get("dims", 2)
+    fn_class = config.get("objective", {}).get("function", None)
+
+    # define for NN objective function
+    if fn_class is None or fn_class == "NeuralNetworkOneLayerTrained":
+        fn_class = NeuralNetworkOneLayerTrained
+        model = config.get("objective", {}).get("model", None)
+        if model is None:
+            raise ValueError("NN pretrained model is not specified")
+        obj_args = model
+        name = os.path.basename(model).split(".")[0]
+
+    # define for normal objective functions
+    else:
+        fn_class = eval(fn_class)
+        dims = config.get("objective", {}).get("dims", 2)
+        obj_args = dims
+        name = fn_class.__name__
+
     lb = config.get("objective", {}).get("lb", None)
     ub = config.get("objective", {}).get("ub", None)
     init_args = config.get("initial", {})
@@ -46,14 +62,16 @@ def mciv_test(config_file):
 
     # ===========================================================================
     # run the optimization
-    fn = fn_class(dims=dims)
+    fn = fn_class(obj_args)
     if (lb is None) or (ub is None):
         lb, ub = fn.get_default_bounds()
 
     alg = MCIV(fn, lb, ub, **init_args)
+    dims = alg.dims  # retrieve the dims again
+
     start = time.time()
     try:
-        print(f"Start optimization {fn_class.__name__} at dim {dims}")
+        print(f"Start optimization {name} at dim {dims}")
         best_y = alg.optimize(**optimize_args)
     except:
         best_y = alg.root.y
@@ -84,10 +102,13 @@ def mciv_test(config_file):
         first_reach_sample = np.where(history[:, 0] == best_y)[0][0]
     except:
         first_reach_sample = total_sample
-    first_reach_time = first_reach_sample / total_sample * eclipsed
+    try:
+        first_reach_time = first_reach_sample / total_sample * eclipsed
+    except:
+        first_reach_time = eclipsed
 
     # std output rename
-    save_filename = f"{fn_class.__name__}_{dims}d_{temp_filename}"
+    save_filename = f"{name}_{dims}d_{temp_filename}"
     save_file = os.path.join(save_dir, save_filename)
     try:
         os.popen("mv {} {}".format(temp_file, save_file))
@@ -99,7 +120,7 @@ def mciv_test(config_file):
     np.save(history_filename, history)
 
     # save the results
-    result_filename = f"{fn_class.__name__}.txt"
+    result_filename = f"{name}.txt"
     result_file = os.path.join(save_dir, result_filename)
 
     with open(result_file, "a+") as fp:
@@ -114,7 +135,7 @@ def mciv_test(config_file):
             )
 
         # write results
-        fp.write(f"{fn_class.__name__} ; ")
+        fp.write(f"{name} ; ")
         fp.write(f"{dims} ; ")
         fp.write(f"{best_y:.6f} ; ")
         fp.write(f"{seed} ; ")
