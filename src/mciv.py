@@ -165,8 +165,6 @@ class MCIV:
         # local optimization
         self.local_optimizer = None
         self.n_opt_local = n_opt_local
-        if self.n_opt_local > 0:
-            self._init_local_opt(self.n_opt_local, **kwargs)
 
         ########## Update other parameters ##########
 
@@ -228,9 +226,9 @@ class MCIV:
             # new samples, and new guess within the node
             y_best, x_best = self.node_exploitation(node)
             if self.verbose >= 2:
-                print(
-                    f"  Best found point in node {node.name} is: {y_best:.4f} , {x_best}"
-                )
+                print(f"  Best found point in node {node.name} is: {y_best:.4f}")
+            if self.verbose >= 3:
+                print(f"  Best found point in node {node.name} is: ", x_best)
 
             # backpropagation is done in above step
             # # back propagation
@@ -306,29 +304,29 @@ class MCIV:
             print(f"  Node {node.children[best].name} is selected")
         return node.children[best]
 
-    def select_by_uct_interval(self, node):
-        ucts = []
-        for child in node.children:
-            fn_interv = self.node_interval[child.name]
+    # def select_by_uct_interval(self, node):
+    #     ucts = []
+    #     for child in node.children:
+    #         fn_interv = self.node_interval[child.name]
 
-            term1 = child.y
-            term2 = fn_interv[0]
-            term3 = np.sqrt(node.visit) / (1 + child.visit)
+    #         term1 = child.y
+    #         term2 = fn_interv[0]
+    #         term3 = np.sqrt(node.visit) / (1 + child.visit)
 
-            uct = (
-                -term1 - self.node_uct_lb_coeff * term2 + self.node_uct_explore * term3
-            )
+    #         uct = (
+    #             -term1 - self.node_uct_lb_coeff * term2 + self.node_uct_explore * term3
+    #         )
 
-            if self.verbose >= 3:
-                print(
-                    f"  Node {child.name} has uct: {uct:.4f} =  - ({term1:.4f}) - {self.node_uct_lb_coeff} * ({term2:.4f}) + {self.node_uct_explore} * ({term3:.4f}) "
-                )
-            ucts.append(uct)
+    #         if self.verbose >= 3:
+    #             print(
+    #                 f"  Node {child.name} has uct: {uct:.4f} =  - ({term1:.4f}) - {self.node_uct_lb_coeff} * ({term2:.4f}) + {self.node_uct_explore} * ({term3:.4f}) "
+    #             )
+    #         ucts.append(uct)
 
-        best = np.argmax(ucts)
-        if self.verbose >= 3:
-            print(f"  Node {node.children[best].name} is selected")
-        return node.children[best]
+    #     best = np.argmax(ucts)
+    #     if self.verbose >= 3:
+    #         print(f"  Node {node.children[best].name} is selected")
+    #     return node.children[best]
 
     def split_box_for_children(self, node):
         lb, ub = self.node_bounds[node.name]
@@ -373,12 +371,13 @@ class MCIV:
                 _lb, _ub = boxes[ii]
                 self.assign_box(child, _lb, _ub)
                 self.evaluate_node_function_interval(child)
-                if self.verbose >= 3:
-                    print(f"assign {child.name} lb|ub:", _lb, _ub)
+                if self.verbose >= 2:
                     print(
                         f"assign {child.name} fn_interv:",
                         self.node_interval[child.name],
                     )
+                if self.verbose >= 3:
+                    print(f"assign {child.name} lb|ub:", _lb, _ub)
 
             # update the function interval for valid children
             self.backprop_interval_from_leaf(cover_set[0])
@@ -668,8 +667,10 @@ class MCIV:
 
         # Compute local gradient and hessian(diagonal) from sampling
         neighbor_samples = 20
-        dx = 1.0
+        lb_parent, ub_parent = self.node_bounds[node.name]
+        dx_ratio = 0.1
         x = copy.deepcopy(node.X)
+        dx = (ub_parent - lb_parent) * dx_ratio
         lb = x - dx
         ub = x + dx
         grads = []
@@ -733,9 +734,10 @@ class MCIV:
 
         if self.verbose >= 2:
             print(
-                f"After creating child nodes for {node.name}, best point: {node.y:.4f}  ",
-                node.X,
+                f"After creating child nodes for {node.name}, best point value: {node.y:.4f}  "
             )
+        if self.verbose >= 3:
+            print(f"Best point is at : ", node.X)
 
         # Step 2. Guess a good point from global Hessian and neighbor gradient
 
@@ -769,44 +771,45 @@ class MCIV:
 
         if self.verbose >= 2:
             print(
-                f"New node {child.name} by optimizing with global Hessian and neighbor gradient: {child.y:.4f} ",
-                child.X,
+                f"New node {child.name} by optimizing with global Hessian and neighbor gradient: {child.y:.4f} "
             )
+        if self.verbose >= 3:
+            print(f"New node {child.name} is at : ", child.X)
 
-        # Step 3. Guess a good point from local Hessian and local gradient
+        # # Step 3. Guess a good point from local Hessian and local gradient
 
-        # Create another new sample by guessing a good point from local fprime and fhess
-        # using newton's method for convex functions
-        # using gradient descent for concave functions
-        anchor = self.guess_good_local(node)
-        anchor = self._clip_point(anchor)
+        # # Create another new sample by guessing a good point from local fprime and fhess
+        # # using newton's method for convex functions
+        # # using gradient descent for concave functions
+        # anchor = self.guess_good_local(node)
+        # anchor = self._clip_point(anchor)
 
-        parent = self.root
-        child = self.create_node(anchor)
-        child.set_parent(parent)
-        child.name = parent.name + "_" + f"{len(parent.children)}"
+        # parent = self.root
+        # child = self.create_node(anchor)
+        # child.set_parent(parent)
+        # child.name = parent.name + "_" + f"{len(parent.children)}"
 
-        # Local optimization
-        if self.local_optimizer is not None:
-            self.node_local_optimize(child)
-        self.backprop(child)
+        # # Local optimization
+        # if self.local_optimizer is not None:
+        #     self.node_local_optimize(child)
+        # self.backprop(child)
 
-        # Assign box for the new node
-        lb, ub = self.node_bounds[node.name]
-        dist = 0.5 * (ub - lb)
-        lb = anchor - dist
-        ub = anchor + dist
-        lb = np.clip(lb, self.lb, self.ub)
-        ub = np.clip(ub, self.lb, self.ub)
-        self.assign_box(child, lb, ub)
-        # Evaluate function interval
-        self.evaluate_node_function_interval(child)
+        # # Assign box for the new node
+        # lb, ub = self.node_bounds[node.name]
+        # dist = 0.5 * (ub - lb)
+        # lb = anchor - dist
+        # ub = anchor + dist
+        # lb = np.clip(lb, self.lb, self.ub)
+        # ub = np.clip(ub, self.lb, self.ub)
+        # self.assign_box(child, lb, ub)
+        # # Evaluate function interval
+        # self.evaluate_node_function_interval(child)
 
-        if self.verbose >= 2:
-            print(
-                f"New node {child.name} by optimizing with local Hessian and local gradient: {child.y:.4f} ",
-                child.X,
-            )
+        # if self.verbose >= 2:
+        #     print(
+        #         f"New node {child.name} by optimizing with local Hessian and local gradient: {child.y:.4f} ",
+        #         child.X,
+        #     )
 
         return node.y, node.X
 
@@ -984,6 +987,7 @@ class MCIV:
         if self.verbose >= 2:
             print(f" run local optimization on node  {node.name}:")
             print(f"  y0 -> y*: {node.y} -> {result_y}")
+        if self.verbose >= 3:
             print(f"  x0: {x0}")
             print(f"  x*: {result_x}")
 
