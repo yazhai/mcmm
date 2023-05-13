@@ -3,6 +3,8 @@ from typing import Any
 
 import numpy as np
 
+# import nlopt
+
 from collections import defaultdict
 
 import jax.numpy as jnp
@@ -855,7 +857,7 @@ class MCIV:
 
     def _bound_volume(self, lb, ub):
         # return the volumn of the box
-        return np.log10(np.prod(ub - lb))
+        return np.log(np.prod(ub - lb))
 
     def normalize_volume(self, vol):
         if self._global_volume is None:
@@ -863,8 +865,10 @@ class MCIV:
 
         # default range is [0, 1.0]
         # if the volume ratio is (0.5)^dims, we set the value to 0.5
-        ratio = vol / self._global_volume
-        value = np.exp(np.log(ratio) / self.dims)
+        # Note the volume is computed by log
+        # so the ratio is computed by minus and exp
+        ratio = (vol - self._global_volume) / self.dims
+        value = np.exp(ratio)
 
         return value
 

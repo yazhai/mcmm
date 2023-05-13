@@ -1,5 +1,5 @@
 # First, install with conda env
-# conda install --file requiremen.txt -c conda-forge -c anaconda -c benensta -c pytorch -c default
+# conda install --file requirement.txt -c conda-forge -c anaconda -c benensta -c pytorch -c default
 python=3.9
 jax
 scipy
