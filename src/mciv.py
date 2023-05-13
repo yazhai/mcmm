@@ -1,4 +1,4 @@
-import copy
+import copy, time
 from typing import Any
 
 import numpy as np
@@ -176,9 +176,16 @@ class MCIV:
 
         ########## Update other parameters ##########
 
-        # jit the function gradient and hessian
-        self._grad_jit = jax_jit(jax_grad(self.fn))
-        self._hessian_jit = jax_jit(jax_hessian(self.fn))
+        self.time_jit = 0.0
+        try:
+            start = time.time()
+            # jit the function gradient and hessian
+            self._grad_jit = jax_jit(jax_grad(self.fn))
+            self._hessian_jit = jax_jit(jax_hessian(self.fn))
+            end = time.time()
+            self.time_jit = end - start
+        except:
+            pass
 
         self.set_parameters(**kwargs)
 
