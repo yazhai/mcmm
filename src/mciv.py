@@ -582,7 +582,7 @@ class MCIV:
         box = []
         for ii in range(len(lb)):
             box.append([lb[ii], ub[ii]])
-        return IntervalVector(box)
+        return box
 
     @property
     def history(self):
@@ -612,17 +612,17 @@ class MCIV:
 
     def _grad(self, x):
         try:
-            return self._grad_jit(x)
+            return np.asarray(self._grad_jit(x)).astype(x.dtype)
         except:
             print(" Failed to use jit grad, use grad instead")
-            return jax_grad(self.fn)(x)
+            return np.asarray(jax_grad(self.fn)(x)).astype(x.dtype)
 
     def _hessian(self, x):
         try:
-            return self._hessian_jit(x)
+            return np.asarray(self._hessian_jit(x)).astype(x.dtype)
         except:
             print(" Failed to use jit hessian, use hessian instead")
-            return jax_hessian(self.fn)(x)
+            return np.asarray(jax_hessian(self.fn)(x)).astype(x.dtype)
 
     def _newton_step(self, x, gradinet, hessian_diagonal):
         x_new = x - gradinet / hessian_diagonal
@@ -634,8 +634,10 @@ class MCIV:
 
     def _function_interval_on_box(self, box):
         # Compute the function value interval
-        # box: IntervalVector
+        # box: IntervalVector or list of Interval pairs
         # return: function value Interval
+        if not isinstance(box, IntervalVector):
+            box = IntervalVector(box)
         function_interval = evaluate_function_interval(
             self.function_variables, self.function_expression, box
         )
@@ -955,18 +957,23 @@ class MCIV:
         return
 
     def _init_local_opt(self, n_opt_local, **kwargs):
+        self._box_global = self._list_to_box(self.lb, self.ub)
         self.local_optimizer = scipy_minimize
+
         self.local_opt_kwargs = {
-            "method": "BFGS",
+            "method": "L-BFGS-B",
             "jac": self._grad,
-            "options": {"maxiter": n_opt_local, "disp": False},
+            "options": {"maxfun": n_opt_local, "disp": False},
+            "bounds": self._box_global,
         }
 
     def local_opt_from(self, x0):
         result_x = x0
-        result_y = self.fn(x0)
+        result_y = self.get_groundtruth(x0)
         if self.local_optimizer is not None:
-            res = self.local_optimizer(self.fn, x0, **self.local_opt_kwargs)
+            res = self.local_optimizer(
+                self.get_groundtruth, x0, **self.local_opt_kwargs
+            )
             result_x = res.x
             result_y = res.fun
         return result_y, result_x
