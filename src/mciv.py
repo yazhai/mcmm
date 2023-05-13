@@ -52,6 +52,7 @@ class MCIV:
         function_variables=None,  # symbolic variables of the function
         function_expression=None,  # symbolic expression of the function
         suggest_by="root",  # "root" (the root of f==lb) or "box" (within box f==lb)
+        seed=None,  # random seed
         **kwargs,
     ):
         # function, input domain, and dimension
@@ -114,6 +115,8 @@ class MCIV:
         ##### Optimization related ##########
         # iterations
         self.max_iterations = max_iterations
+
+        self.seed = seed
 
         # root is initialized to the anchor
         # if anchor is provided
@@ -189,6 +192,9 @@ class MCIV:
             self._init_local_opt(self.n_opt_local)
 
         if not restart:
+            if self.root is not None:
+                np.random.seed(self.seed)
+
             self.root = None
             if self.if_save_history:
                 self._history = self._cache_expand()
