@@ -68,6 +68,11 @@ class MCIV:
         # Symbolic expression of the function
         self.function_variables = function_variables
         self.function_expression = function_expression
+        if (self.function_variables is None) or (self.function_expression is None):
+            try:
+                self.function_variables, self.function_expression = self.fn.expression()
+            except:
+                pass
 
         # logging
         self.log = log

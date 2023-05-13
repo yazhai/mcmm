@@ -74,6 +74,7 @@ def mciv_test(config_file):
         print(f"Start optimization {name} at dim {dims}")
         best_y = alg.optimize(**optimize_args)
     except:
+        print(f"Optimization {name} at dim {dims} terminated")
         best_y = alg.root.y
     end = time.time()
     eclipsed = end - start
@@ -120,7 +121,7 @@ def mciv_test(config_file):
     np.save(history_filename, history)
 
     # save the results
-    result_filename = f"{name}.txt"
+    result_filename = f"00_{name}.txt"
     result_file = os.path.join(save_dir, result_filename)
 
     with open(result_file, "a+") as fp:
