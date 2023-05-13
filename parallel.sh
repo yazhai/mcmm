@@ -1,4 +1,6 @@
 #!/bin/bash
 
-ls benchmark_settings/*.json | parallel -j$(nproc) "python run.py {} &"
+files=$(ls ./benchmark_settings/*.json)
+
+echo "$files" | parallel "python run.py {} "
 
