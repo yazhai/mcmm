@@ -873,7 +873,10 @@ class MCIV:
 
     def _bound_volume(self, lb, ub):
         # return the volumn of the box
-        return np.log(np.prod(ub - lb))
+        dist = ub - lb
+        dist[dist < 1e-6] = 1e-6  # avoid log(0)
+        volume = np.sum(np.log(dist))
+        return volume
 
     def normalize_volume(self, vol):
         if self._global_volume is None:
