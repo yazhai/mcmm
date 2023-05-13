@@ -95,6 +95,7 @@ def mciv_test(config_file):
     node_uct_explore = alg.node_uct_explore
     num_node_expand = alg.num_node_expand
     seed = alg.seed
+    time_jit = alg.time_jit
 
     # get history from the object
     history = alg.history
@@ -132,7 +133,7 @@ def mciv_test(config_file):
         c = fp.readlines()
         if len(c) == 0:
             fp.write(
-                "#fn_name ; dims ; best_y ; seed ; total_time ; first_reach_time ; total_sample ; first_reach_sample; max_iteration ; node_uct_lb_coeff ; node_uct_box_coeff ; node_uct_explore ; num_node_expand ; n_opt_local \n"
+                "#fn_name ; dims ; best_y ; seed ; total_time ; first_reach_time ; total_sample ; first_reach_sample; max_iteration ; node_uct_lb_coeff ; node_uct_box_coeff ; node_uct_explore ; num_node_expand ; n_opt_local ; time_jit \n"
             )
 
         # write results
@@ -149,7 +150,8 @@ def mciv_test(config_file):
         fp.write(f"{node_uct_box_coeff} ; ")
         fp.write(f"{node_uct_explore} ; ")
         fp.write(f"{num_node_expand} ; ")
-        fp.write(f"{n_opt_local} \n")
+        fp.write(f"{n_opt_local} ")
+        fp.write(f"{time_jit:.4f} \n"
 
         fcntl.flock(fp, fcntl.LOCK_UN)
 
