@@ -56,7 +56,6 @@ class MCIV:
         **kwargs,
     ):
         # function, input domain, and dimension
-        self.fn = fn
         if not isinstance(lb, np.ndarray):
             lb = np.array(lb)
         self.lb = lb
@@ -64,6 +63,10 @@ class MCIV:
             ub = np.array(ub)
         self.ub = ub
         self.dims = len(lb)
+        if self.dims > 50:
+            self.fn = jax_jit(fn)
+        else:
+            self.fn = fn
 
         # Symbolic expression of the function
         self.function_variables = function_variables

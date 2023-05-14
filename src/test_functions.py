@@ -5,6 +5,8 @@ import torch
 import torch.nn as nn
 import sympy
 
+from .nlp import *
+
 
 class TestFunction:
     def __init__(self, dims: int = 2) -> None:
@@ -532,3 +534,108 @@ class NeuralNetworkOneLayerTrained(NeuralNetworkOneLayer):
 
     def get_default_domain(self) -> np.ndarray:
         return self.domain
+
+
+class Biggsbi1(TestFunction):
+    def __init__(self, dims: int = 1001) -> None:
+        super().__init__(1001)
+
+    def __call__(self, x: np.ndarray) -> float:
+        assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
+        assert x.ndim == 1
+        result = biggsbi1(x)
+        return result
+
+    def get_default_domain(self) -> np.ndarray:
+        bounds = np.array([[0, 0.9]] * self.dims)
+        bounds[0] = [0.0, 0.0]
+        return bounds
+
+    def expression(self):
+        variables = [f"x[{self.dims}]"]
+        expression = biggsbi1_exp()
+        return variables, expression
+
+
+class Eigenals(TestFunction):
+    def __init__(self, dims: int = 111) -> None:
+        super().__init__(111)
+
+    def __call__(self, x: np.ndarray) -> float:
+        assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
+        assert x.ndim == 1
+        result = eigenals(x)
+        return result
+
+    def get_default_domain(self) -> np.ndarray:
+        bounds = np.array([[-10.0, 10.0]] * self.dims)
+        bounds[0] = [0.0, 0.0]
+        return bounds
+
+    def expression(self):
+        variables = [f"x[{self.dims}]"]
+        expression = eigenals_exp()
+        return variables, expression
+
+
+class Harkerp(TestFunction):
+    def __init__(self, dims: int = 101) -> None:
+        super().__init__(101)
+
+    def __call__(self, x: np.ndarray) -> float:
+        assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
+        assert x.ndim == 1
+        result = harkper(x)
+        return result
+
+    def get_default_domain(self) -> np.ndarray:
+        bounds = np.array([[0.0, 10.0]] * self.dims)
+        bounds[0] = [0.0, 0.0]
+        return bounds
+
+    def expression(self):
+        variables = [f"x[{self.dims}]"]
+        expression = harkper_exp()
+        return variables, expression
+
+
+class Vardim(TestFunction):
+    def __init__(self, dims: int = 101) -> None:
+        super().__init__(101)
+
+    def __call__(self, x: np.ndarray) -> float:
+        assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
+        assert x.ndim == 1
+        result = vardim(x)
+        return result
+
+    def get_default_domain(self) -> np.ndarray:
+        bounds = np.array([[-10.0, 10.0]] * self.dims)
+        bounds[0] = [0.0, 0.0]
+        return bounds
+
+    def expression(self):
+        variables = [f"x[{self.dims}]"]
+        expression = vardim_exp()
+        return variables, expression
+
+
+class Watson(TestFunction):
+    def __init__(self, dims: int = 32) -> None:
+        super().__init__(32)
+
+    def __call__(self, x: np.ndarray) -> float:
+        assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
+        assert x.ndim == 1
+        result = watson(x)
+        return result
+
+    def get_default_domain(self) -> np.ndarray:
+        bounds = np.array([[-10.0, 10.0]] * self.dims)
+        bounds[0] = [0.0, 0.0]
+        return bounds
+
+    def expression(self):
+        variables = [f"x[{self.dims}]"]
+        expression = watson_exp()
+        return variables, expression
