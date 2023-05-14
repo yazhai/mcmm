@@ -1,4 +1,4 @@
-import copy
+import copy, time
 from typing import Any
 
 import numpy as np
@@ -12,6 +12,7 @@ import jax.numpy as jnp
 # from jax import device_put, grad, jit, random, vmap
 from jax import grad as jax_grad
 from jax import hessian as jax_hessian
+from jax import jit as jax_jit
 
 from scipy.stats import qmc
 from scipy.optimize import minimize as scipy_minimize
@@ -51,6 +52,7 @@ class MCIV:
         function_variables=None,  # symbolic variables of the function
         function_expression=None,  # symbolic expression of the function
         suggest_by="root",  # "root" (the root of f==lb) or "box" (within box f==lb)
+        seed=None,  # random seed
         **kwargs,
     ):
         # function, input domain, and dimension
@@ -66,6 +68,11 @@ class MCIV:
         # Symbolic expression of the function
         self.function_variables = function_variables
         self.function_expression = function_expression
+        if (self.function_variables is None) or (self.function_expression is None):
+            try:
+                self.function_variables, self.function_expression = self.fn.expression()
+            except:
+                pass
 
         # logging
         self.log = log
@@ -98,6 +105,7 @@ class MCIV:
         self._interval_global = (
             None  # global function interval on the whole input domain
         )
+        self._interval_max_score = 100.0  # max score of the interval when f(x) = lb
 
         # dict to save the index of the children that covers the box of the parent
         self.node_cover_children = defaultdict(list)
@@ -112,6 +120,8 @@ class MCIV:
         ##### Optimization related ##########
         # iterations
         self.max_iterations = max_iterations
+
+        self.seed = seed
 
         # root is initialized to the anchor
         # if anchor is provided
@@ -163,10 +173,20 @@ class MCIV:
         # local optimization
         self.local_optimizer = None
         self.n_opt_local = n_opt_local
-        if self.n_opt_local > 0:
-            self._init_local_opt(self.n_opt_local, **kwargs)
 
         ########## Update other parameters ##########
+
+        self.time_jit = 0.0
+        try:
+            start = time.time()
+            # jit the function gradient and hessian
+            self._grad_jit = jax_jit(jax_grad(self.fn))
+            self._hessian_jit = jax_jit(jax_hessian(self.fn))
+            end = time.time()
+            self.time_jit = end - start
+        except:
+            pass
+
         self.set_parameters(**kwargs)
 
         return
@@ -184,6 +204,9 @@ class MCIV:
             self._init_local_opt(self.n_opt_local)
 
         if not restart:
+            if self.root is not None:
+                np.random.seed(self.seed)
+
             self.root = None
             if self.if_save_history:
                 self._history = self._cache_expand()
@@ -221,9 +244,9 @@ class MCIV:
             # new samples, and new guess within the node
             y_best, x_best = self.node_exploitation(node)
             if self.verbose >= 2:
-                print(
-                    f"  Best found point in node {node.name} is: {y_best:.4f} , {x_best}"
-                )
+                print(f"  Best found point in node {node.name} is: {y_best:.4f}")
+            if self.verbose >= 3:
+                print(f"  Best found point in node {node.name} is: ", x_best)
 
             # backpropagation is done in above step
             # # back propagation
@@ -272,21 +295,25 @@ class MCIV:
             # term3 = lb_box_size
 
             # # Use normalized value
-            term1 = self.normalize_value(child.y)
-            term2 = self.normalize_value(fn_interv[0])
-            term3 = self.normalize_volume(lb_box_size)
-            term4 = np.sqrt(np.log(node.visit) / (1 + child.visit))
+            sample_score = self._interval_max_score * (-self.normalize_value(child.y))
+            interv_score = self._interval_max_score * (
+                -self.normalize_value(fn_interv[0])
+            )
+            volume_score = self._interval_max_score * (
+                1 - self.normalize_volume(lb_box_size)
+            )
+            exploration_score = np.sqrt(np.log(node.visit) / (1 + child.visit))
 
             uct = (
-                -term1
-                - self.node_uct_lb_coeff * term2
-                - self.node_uct_box_coeff * term3
-                + self.node_uct_explore * term4
+                sample_score
+                + self.node_uct_lb_coeff * interv_score
+                + self.node_uct_box_coeff * volume_score
+                + self.node_uct_explore * exploration_score
             )
 
             if self.verbose >= 2:
                 print(
-                    f"  Node {child.name} has uct: {uct:.4f} =  - ({term1:.4f}) - {self.node_uct_lb_coeff} * ({term2:.4f}) - {self.node_uct_box_coeff} * ({term3:.4f}) + {self.node_uct_explore} * ({term4:.4f})"
+                    f"  Node {child.name} has uct: {uct:.4f} =  ({sample_score:.4f}) + {self.node_uct_lb_coeff} * ({interv_score:.4f}) + {self.node_uct_box_coeff} * ({volume_score:.4f}) + {self.node_uct_explore} * ({exploration_score:.4f})"
                 )
             ucts.append(uct)
 
@@ -295,29 +322,29 @@ class MCIV:
             print(f"  Node {node.children[best].name} is selected")
         return node.children[best]
 
-    def select_by_uct_interval(self, node):
-        ucts = []
-        for child in node.children:
-            fn_interv = self.node_interval[child.name]
+    # def select_by_uct_interval(self, node):
+    #     ucts = []
+    #     for child in node.children:
+    #         fn_interv = self.node_interval[child.name]
 
-            term1 = child.y
-            term2 = fn_interv[0]
-            term3 = np.sqrt(node.visit) / (1 + child.visit)
+    #         term1 = child.y
+    #         term2 = fn_interv[0]
+    #         term3 = np.sqrt(node.visit) / (1 + child.visit)
 
-            uct = (
-                -term1 - self.node_uct_lb_coeff * term2 + self.node_uct_explore * term3
-            )
+    #         uct = (
+    #             -term1 - self.node_uct_lb_coeff * term2 + self.node_uct_explore * term3
+    #         )
 
-            if self.verbose >= 3:
-                print(
-                    f"  Node {child.name} has uct: {uct:.4f} =  - ({term1:.4f}) - {self.node_uct_lb_coeff} * ({term2:.4f}) + {self.node_uct_explore} * ({term3:.4f}) "
-                )
-            ucts.append(uct)
+    #         if self.verbose >= 3:
+    #             print(
+    #                 f"  Node {child.name} has uct: {uct:.4f} =  - ({term1:.4f}) - {self.node_uct_lb_coeff} * ({term2:.4f}) + {self.node_uct_explore} * ({term3:.4f}) "
+    #             )
+    #         ucts.append(uct)
 
-        best = np.argmax(ucts)
-        if self.verbose >= 3:
-            print(f"  Node {node.children[best].name} is selected")
-        return node.children[best]
+    #     best = np.argmax(ucts)
+    #     if self.verbose >= 3:
+    #         print(f"  Node {node.children[best].name} is selected")
+    #     return node.children[best]
 
     def split_box_for_children(self, node):
         lb, ub = self.node_bounds[node.name]
@@ -362,12 +389,13 @@ class MCIV:
                 _lb, _ub = boxes[ii]
                 self.assign_box(child, _lb, _ub)
                 self.evaluate_node_function_interval(child)
-                if self.verbose >= 3:
-                    print(f"assign {child.name} lb|ub:", _lb, _ub)
+                if self.verbose >= 2:
                     print(
                         f"assign {child.name} fn_interv:",
                         self.node_interval[child.name],
                     )
+                if self.verbose >= 3:
+                    print(f"assign {child.name} lb|ub:", _lb, _ub)
 
             # update the function interval for valid children
             self.backprop_interval_from_leaf(cover_set[0])
@@ -571,7 +599,7 @@ class MCIV:
         box = []
         for ii in range(len(lb)):
             box.append([lb[ii], ub[ii]])
-        return IntervalVector(box)
+        return box
 
     @property
     def history(self):
@@ -600,18 +628,18 @@ class MCIV:
         return fprime, fhess_diag
 
     def _grad(self, x):
-        return jax_grad(self.fn)(x)
+        try:
+            return np.asarray(self._grad_jit(x)).astype(x.dtype)
+        except:
+            print(" Failed to use jit grad, use grad instead")
+            return np.asarray(jax_grad(self.fn)(x)).astype(x.dtype)
 
     def _hessian(self, x):
-        # # returns only the diagonal of the hessian
-        # dfdx = self._grad(x)
-        # hessian_diagonal = jnp.zeros(self.dims)
-        # for ii in range(self.dims):
-        #     hessian_diagonal[ii] = jax_grad(lambda x: dfdx[ii])(x)[ii]
-        # return hessian_diagonal
-
-        # returns the full hessian
-        return jax_hessian(self.fn)(x)
+        try:
+            return np.asarray(self._hessian_jit(x)).astype(x.dtype)
+        except:
+            print(" Failed to use jit hessian, use hessian instead")
+            return np.asarray(jax_hessian(self.fn)(x)).astype(x.dtype)
 
     def _newton_step(self, x, gradinet, hessian_diagonal):
         x_new = x - gradinet / hessian_diagonal
@@ -623,8 +651,10 @@ class MCIV:
 
     def _function_interval_on_box(self, box):
         # Compute the function value interval
-        # box: IntervalVector
+        # box: IntervalVector or list of Interval pairs
         # return: function value Interval
+        if not isinstance(box, IntervalVector):
+            box = IntervalVector(box)
         function_interval = evaluate_function_interval(
             self.function_variables, self.function_expression, box
         )
@@ -655,8 +685,10 @@ class MCIV:
 
         # Compute local gradient and hessian(diagonal) from sampling
         neighbor_samples = 20
-        dx = 1.0
+        lb_parent, ub_parent = self.node_bounds[node.name]
+        dx_ratio = 0.1
         x = copy.deepcopy(node.X)
+        dx = (ub_parent - lb_parent) * dx_ratio
         lb = x - dx
         ub = x + dx
         grads = []
@@ -720,9 +752,10 @@ class MCIV:
 
         if self.verbose >= 2:
             print(
-                f"After creating child nodes for {node.name}, best point: {node.y:.4f}  ",
-                node.X,
+                f"After creating child nodes for {node.name}, best point value: {node.y:.4f}  "
             )
+        if self.verbose >= 3:
+            print(f"Best point is at : ", node.X)
 
         # Step 2. Guess a good point from global Hessian and neighbor gradient
 
@@ -756,44 +789,45 @@ class MCIV:
 
         if self.verbose >= 2:
             print(
-                f"New node {child.name} by optimizing with global Hessian and neighbor gradient: {child.y:.4f} ",
-                child.X,
+                f"New node {child.name} by optimizing with global Hessian and neighbor gradient: {child.y:.4f} "
             )
+        if self.verbose >= 3:
+            print(f"New node {child.name} is at : ", child.X)
 
-        # Step 3. Guess a good point from local Hessian and local gradient
+        # # Step 3. Guess a good point from local Hessian and local gradient
 
-        # Create another new sample by guessing a good point from local fprime and fhess
-        # using newton's method for convex functions
-        # using gradient descent for concave functions
-        anchor = self.guess_good_local(node)
-        anchor = self._clip_point(anchor)
+        # # Create another new sample by guessing a good point from local fprime and fhess
+        # # using newton's method for convex functions
+        # # using gradient descent for concave functions
+        # anchor = self.guess_good_local(node)
+        # anchor = self._clip_point(anchor)
 
-        parent = self.root
-        child = self.create_node(anchor)
-        child.set_parent(parent)
-        child.name = parent.name + "_" + f"{len(parent.children)}"
+        # parent = self.root
+        # child = self.create_node(anchor)
+        # child.set_parent(parent)
+        # child.name = parent.name + "_" + f"{len(parent.children)}"
 
-        # Local optimization
-        if self.local_optimizer is not None:
-            self.node_local_optimize(child)
-        self.backprop(child)
+        # # Local optimization
+        # if self.local_optimizer is not None:
+        #     self.node_local_optimize(child)
+        # self.backprop(child)
 
-        # Assign box for the new node
-        lb, ub = self.node_bounds[node.name]
-        dist = 0.5 * (ub - lb)
-        lb = anchor - dist
-        ub = anchor + dist
-        lb = np.clip(lb, self.lb, self.ub)
-        ub = np.clip(ub, self.lb, self.ub)
-        self.assign_box(child, lb, ub)
-        # Evaluate function interval
-        self.evaluate_node_function_interval(child)
+        # # Assign box for the new node
+        # lb, ub = self.node_bounds[node.name]
+        # dist = 0.5 * (ub - lb)
+        # lb = anchor - dist
+        # ub = anchor + dist
+        # lb = np.clip(lb, self.lb, self.ub)
+        # ub = np.clip(ub, self.lb, self.ub)
+        # self.assign_box(child, lb, ub)
+        # # Evaluate function interval
+        # self.evaluate_node_function_interval(child)
 
-        if self.verbose >= 2:
-            print(
-                f"New node {child.name} by optimizing with local Hessian and local gradient: {child.y:.4f} ",
-                child.X,
-            )
+        # if self.verbose >= 2:
+        #     print(
+        #         f"New node {child.name} by optimizing with local Hessian and local gradient: {child.y:.4f} ",
+        #         child.X,
+        #     )
 
         return node.y, node.X
 
@@ -830,11 +864,9 @@ class MCIV:
         if self._interval_global[0] == self._interval_global[1]:
             return 0
         else:
-            # default range is [0, 100]
-            return (
-                100.0
-                * (value - self._interval_global[0])
-                / (self._interval_global[1] - self._interval_global[0])
+            # default range is [0, 1]
+            return (value - self._interval_global[0]) / (
+                self._interval_global[1] - self._interval_global[0]
             )
 
     def _bounds_union(self, lbs, ubs):
@@ -848,18 +880,23 @@ class MCIV:
 
     def _bound_volume(self, lb, ub):
         # return the volumn of the box
-        return np.log10(np.prod(ub - lb))
+        dist = ub - lb
+        dist[dist < 1e-6] = 1e-6  # avoid log(0)
+        volume = np.sum(np.log(dist))
+        return volume
 
     def normalize_volume(self, vol):
         if self._global_volume is None:
             self._global_volume = self._bound_volume(self.lb, self.ub)
 
-        # default range is [0, 100]
-        # if the volume ratio is (0.5)^dims, we set the value to 50
-        ratio = vol / self._global_volume
-        value = np.exp(np.log(ratio) / self.dims)
+        # default range is [0, 1.0]
+        # if the volume ratio is (0.5)^dims, we set the value to 0.5
+        # Note the volume is computed by log
+        # so the ratio is computed by minus and exp
+        ratio = (vol - self._global_volume) / self.dims
+        value = np.exp(ratio)
 
-        return value * 1.0
+        return value
 
     def _1dinterval_merge(self, intervals):
         # Union of intervals (or )
@@ -944,18 +981,23 @@ class MCIV:
         return
 
     def _init_local_opt(self, n_opt_local, **kwargs):
+        self._box_global = self._list_to_box(self.lb, self.ub)
         self.local_optimizer = scipy_minimize
+
         self.local_opt_kwargs = {
-            "method": "BFGS",
+            "method": "L-BFGS-B",
             "jac": self._grad,
-            "options": {"maxiter": n_opt_local, "disp": False},
+            "options": {"maxfun": n_opt_local, "disp": False},
+            "bounds": self._box_global,
         }
 
     def local_opt_from(self, x0):
         result_x = x0
-        result_y = self.fn(x0)
+        result_y = self.get_groundtruth(x0)
         if self.local_optimizer is not None:
-            res = self.local_optimizer(self.fn, x0, **self.local_opt_kwargs)
+            res = self.local_optimizer(
+                self.get_groundtruth, x0, **self.local_opt_kwargs
+            )
             result_x = res.x
             result_y = res.fun
         return result_y, result_x
@@ -966,6 +1008,7 @@ class MCIV:
         if self.verbose >= 2:
             print(f" run local optimization on node  {node.name}:")
             print(f"  y0 -> y*: {node.y} -> {result_y}")
+        if self.verbose >= 3:
             print(f"  x0: {x0}")
             print(f"  x*: {result_x}")
 

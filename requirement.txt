@@ -1,6 +1,13 @@
+# First, install with conda env
+# conda install --file requirement.txt -c conda-forge -c anaconda -c benensta -c pytorch -c default
 python=3.9
 jax
 scipy
 scikit-learn
-pyibex
+pytorch
+torchvision
+torchaudio
+tqdm
 
+# Second, install with pyibex with pip
+# pip install pyibex

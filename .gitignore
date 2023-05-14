@@ -3,4 +3,4 @@ test/
 
 **/__pycache__/
 **/.vscode/
-
+*json

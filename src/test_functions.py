@@ -19,6 +19,20 @@ class TestFunction:
     def expression(self):
         raise NotImplementedError
 
+    def get_default_bounds(self) -> np.ndarray:
+        try:
+            box = self.get_default_domain()
+
+            lb = []
+            ub = []
+            for b in box:
+                lb.append(b[0])
+                ub.append(b[1])
+
+            return lb, ub
+        except:
+            raise NotImplementedError
+
 
 class ToyObjective(TestFunction):
     def __init__(self, dims: int = 2) -> None:
@@ -370,10 +384,10 @@ class Michalewicz(TestFunction):
         return variables, expression
 
 
-
-
 class NeuralNetworkOneLayer(TestFunction):
-    def __init__(self, dims: int = 2, domain=None, hidden_dims=16, state_dict=None, device='cpu') -> None:
+    def __init__(
+        self, dims: int = 2, domain=None, hidden_dims=16, state_dict=None, device="cpu"
+    ) -> None:
         super().__init__(dims)
         self.model = nn.Sequential(
             nn.Linear(dims, hidden_dims),
@@ -385,14 +399,13 @@ class NeuralNetworkOneLayer(TestFunction):
 
         if state_dict is not None:
             self.model.load_state_dict(state_dict)
-        
-        
+
         self.hidden_dims = hidden_dims
         self.device = device
 
         if domain is None:
             domain = self.get_default_domain()
-        
+
         self.domain = domain
 
     def __call__(self, x: np.ndarray) -> float:
@@ -407,18 +420,23 @@ class NeuralNetworkOneLayer(TestFunction):
         # return result
 
         x = jnp.expand_dims(x, axis=1)
-        w0, b0 = [mat.detach().cpu().numpy() for mat in [self.model[0].weight, self.model[0].bias]]
+        w0, b0 = [
+            mat.detach().cpu().numpy()
+            for mat in [self.model[0].weight, self.model[0].bias]
+        ]
         w0, b0 = jnp.array(w0), jnp.array(b0)
         x = jnp.dot(w0, x) + jnp.expand_dims(b0, axis=1)
         x = jnp.maximum(0, x)
-        w1, b1 = [mat.detach().cpu().numpy() for mat in [self.model[2].weight, self.model[2].bias]]
+        w1, b1 = [
+            mat.detach().cpu().numpy()
+            for mat in [self.model[2].weight, self.model[2].bias]
+        ]
         w1, b1 = jnp.array(w1), jnp.array(b1)
         x = jnp.dot(w1, x) + jnp.expand_dims(b1, axis=1)
 
         result = x[0][0]
 
         return result
-
 
     def get_default_domain(self) -> np.ndarray:
         return np.array([[-10, 10]] * self.dims)
@@ -431,7 +449,9 @@ class NeuralNetworkOneLayer(TestFunction):
         bias = layer.bias
         width = weight.shape[1]
 
-        inter_vars = sympy.symbols(', '.join(['x[{}][{}]'.format(layer_idx, i) for i in range(width)]))
+        inter_vars = sympy.symbols(
+            ", ".join(["x[{}][{}]".format(layer_idx, i) for i in range(width)])
+        )
 
         X = np.expand_dims(np.array(inter_vars), axis=1)
         W = weight.detach().cpu().numpy()
@@ -445,7 +465,9 @@ class NeuralNetworkOneLayer(TestFunction):
 
         prev_inter_vars = inter_vars
         width = len(inter_vars)
-        inter_vars = sympy.symbols(', '.join(['x[{}][{}]'.format(layer_idx, i) for i in range(width)]))
+        inter_vars = sympy.symbols(
+            ", ".join(["x[{}][{}]".format(layer_idx, i) for i in range(width)])
+        )
 
         replace_dict = {}
         for curr_var, prev_var in zip(inter_vars, prev_inter_vars):
@@ -455,7 +477,6 @@ class NeuralNetworkOneLayer(TestFunction):
         for key in replace_dict:
             expression = expression.subs(key, replace_dict[key])
 
-
         layer_idx = 0
         layer = self.model[layer_idx]
 
@@ -464,7 +485,7 @@ class NeuralNetworkOneLayer(TestFunction):
         width = weight.shape[1]
 
         prev_inter_vars = inter_vars
-        inter_vars = sympy.symbols(', '.join(['x[{}]'.format(i) for i in range(width)]))
+        inter_vars = sympy.symbols(", ".join(["x[{}]".format(i) for i in range(width)]))
         if isinstance(inter_vars, sympy.Symbol):
             inter_vars = [inter_vars]
 
@@ -490,26 +511,24 @@ class NeuralNetworkOneLayer(TestFunction):
 
 
 class NeuralNetworkOneLayerTrained(NeuralNetworkOneLayer):
-    def __init__(self, model_path, device='cpu'):
+    def __init__(self, model_path, device="cpu"):
         import os
+
         assert os.path.exists(model_path), f"Model path {model_path} does not exist"
 
         model_info = torch.load(model_path, map_location=device)
-        state_dict = model_info['state_dict']
-        input_dims = model_info['input_dims']
-        hidden_dims = model_info['hidden_dims']
-        bounds = model_info['bounds']
+        state_dict = model_info["state_dict"]
+        input_dims = model_info["input_dims"]
+        hidden_dims = model_info["hidden_dims"]
+        bounds = model_info["bounds"]
 
         super().__init__(
-            dims=input_dims, 
-            domain=bounds, 
-            hidden_dims=hidden_dims, 
-            state_dict=state_dict, 
-            device=device
+            dims=input_dims,
+            domain=bounds,
+            hidden_dims=hidden_dims,
+            state_dict=state_dict,
+            device=device,
         )
-    
+
     def get_default_domain(self) -> np.ndarray:
         return self.domain
-
-
-
