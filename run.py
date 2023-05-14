@@ -150,7 +150,7 @@ def mciv_test(config_file):
         fp.write(f"{node_uct_box_coeff} ; ")
         fp.write(f"{node_uct_explore} ; ")
         fp.write(f"{num_node_expand} ; ")
-        fp.write(f"{n_opt_local} ")
+        fp.write(f"{n_opt_local} ; ")
         fp.write(f"{time_jit:.4f} \n")
 
         fcntl.flock(fp, fcntl.LOCK_UN)

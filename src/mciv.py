@@ -182,6 +182,10 @@ class MCIV:
             # jit the function gradient and hessian
             self._grad_jit = jax_jit(jax_grad(self.fn))
             self._hessian_jit = jax_jit(jax_hessian(self.fn))
+
+            # test the time for jit as its first call
+            self._grad_jit(self.lb)
+            self._hessian_jit(self.lb)
             end = time.time()
             self.time_jit = end - start
         except:
