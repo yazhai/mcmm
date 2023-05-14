@@ -44,9 +44,10 @@ def mciv_test(config_file):
 
     # ===========================================================================
     # define temperary file saving the print output
-    temp_filename = "".join(
-        random.choices(string.ascii_lowercase + string.digits, k=40)
-    )
+    # temp_filename = "".join(
+    #     random.choices(string.ascii_lowercase + string.digits, k=40)
+    # )
+    temp_filename = os.path.basename(config_file).split(".")[0]
     temp_file = os.path.join(temp_foler, temp_filename)
 
     # Backup original stdout and stderr
@@ -134,7 +135,7 @@ def mciv_test(config_file):
         c = fp.readlines()
         if len(c) == 0:
             fp.write(
-                "#fn_name ; dims ; best_y ; seed ; total_time ; first_reach_time ; total_sample ; first_reach_sample; max_iteration ; node_uct_lb_coeff ; node_uct_box_coeff ; node_uct_explore ; num_node_expand ; n_opt_local ; time_jit \n"
+                "#fn_name ; dims ; best_y ; seed ; total_time ; first_reach_time ; total_sample ; first_reach_sample; max_iteration ; node_uct_lb_coeff ; node_uct_box_coeff ; node_uct_explore ; num_node_expand ; n_opt_local ; time_jit ; config_filename \n"
             )
 
         # write results
@@ -152,7 +153,8 @@ def mciv_test(config_file):
         fp.write(f"{node_uct_explore} ; ")
         fp.write(f"{num_node_expand} ; ")
         fp.write(f"{n_opt_local} ; ")
-        fp.write(f"{time_jit:.4f} \n")
+        fp.write(f"{time_jit:.4f} ; ")
+        fp.write(f"{os.path.basename(config_file)} \n")
 
         fcntl.flock(fp, fcntl.LOCK_UN)
 
