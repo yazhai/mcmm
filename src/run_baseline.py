@@ -10,13 +10,14 @@ from datetime import datetime
 from baselines.gurobi_baseline.gurobi_baseline import GurobiBaselineRunner
 from baselines.scipy_baseline.scipy_baseline import ScipyBaselineRunner
 
+os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = ".10"
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
     "--func",
     type=str,
     default="SumSquare",
-    choices=["Levy", "Ackley", "Dropwave", "SumSquare", "Easom", "Michalewicz"],
+    choices=["Levy", "Ackley", "Dropwave", "SumSquare", "Easom", "Michalewicz", "NeuralNetworkOneLayer"],
     help="The function to optimize. Options are: Levy, Ackley, Dropwave, "
     "SumSquare, Easom, Michalewicz",
 )
@@ -63,6 +64,12 @@ parser.add_argument(
     action="store_true",
     help="Rerun if output exists.",
 )
+parser.add_argument(
+    "--nn_file_path", 
+    type=str, 
+    default=None, 
+    help="The path to the neural network data file."
+)
 
 
 args = parser.parse_args()
@@ -72,12 +79,18 @@ print(args)
 
 
 def get_output_fname(args):
+    fname = None
     if args.solver == "scipy":
-        return f"{args.func}_{args.dims}_{args.solver}_{args.algo}_{args.seed}"
+        fname = f"{args.func}_{args.dims}_{args.solver}_{args.algo}_{args.seed}"
     elif args.solver == "gurobi":
-        return f"{args.func}_{args.dims}_{args.solver}_{args.seed}"
+        fname = f"{args.func}_{args.dims}_{args.solver}_{args.seed}"
     else:
         raise ValueError(f"Unknown solver {args.solver}")
+    
+    if args.func == "NeuralNetworkOneLayer":
+        fname += f"-{args.nn_file_path.split('/')[-1].split('.')[0]}"
+    
+    return fname
 
 
 seed = args.seed
@@ -109,7 +122,7 @@ try:
     if args.solver == "scipy":
         assert args.algo != "none", "If solver is scipy, then algo must be specified."
         runner = ScipyBaselineRunner(
-            args.func, args.dims, args.algo, timeout=args.timeout
+            args.func, args.dims, args.algo, timeout=args.timeout, nn_file_path=args.nn_file_path
         )
     elif args.solver == "gurobi":
         runner = GurobiBaselineRunner(args.func, args.dims, args.algo)

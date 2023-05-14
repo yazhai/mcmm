@@ -22,6 +22,10 @@ parser.add_argument("--device", type=str, default=None)
 parser.add_argument("--seed", type=int, default=0)
 args = parser.parse_args()
 
+print()
+print("Running with args:")
+print(args)
+print()
 # Example usage:
 # python train_nn_one_layer.py --input_dims 2 --hidden_dims 16 --num_epochs 1000 --batch_size 1000 --learning_rate 0.001 --num_samples 50000 --test_function ackley --seed 0
 # python train_nn_one_layer.py --input_dims 10 --hidden_dims 16 --num_epochs 5000 --batch_size 1000 --learning_rate 0.001 --num_samples 250000 --test_function ackley --seed 0

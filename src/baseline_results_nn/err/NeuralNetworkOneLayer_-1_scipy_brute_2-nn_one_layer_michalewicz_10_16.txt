@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/home/zhizhen/Documents/mcmm/src/run_baseline.py", line 130, in <module>
+    result_dict = runner.run()
+  File "/home/zhizhen/Documents/mcmm/src/baselines/scipy_baseline/scipy_baseline.py", line 64, in run
+    scipy_result = self.run_scipy_optimization(
+  File "/home/zhizhen/Documents/mcmm/src/baselines/scipy_baseline/scipy_baseline.py", line 118, in run_scipy_optimization
+    result = opt.brute(func, bounds, full_output=True)
+  File "/home/zhizhen/anaconda3/envs/mciv/lib/python3.9/site-packages/scipy/optimize/_optimize.py", line 3642, in brute
+    grid = np.mgrid[lrange]
+  File "/home/zhizhen/anaconda3/envs/mciv/lib/python3.9/site-packages/numpy/lib/index_tricks.py", line 174, in __getitem__
+    nn = _nx.indices(size, typ)
+  File "/home/zhizhen/anaconda3/envs/mciv/lib/python3.9/site-packages/numpy/core/numeric.py", line 1782, in indices
+    res = empty((N,)+dimensions, dtype=dtype)
+numpy.core._exceptions._ArrayMemoryError: Unable to allocate 745. TiB for an array with shape (10, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20) and data type float64

@@ -18,6 +18,7 @@ from ..test_functions import (
     SumSquare,
     Easom,
     Michalewicz,
+    NeuralNetworkOneLayerTrained,
 )
 
 from ..baseline_runner import BaselineRunner
@@ -31,6 +32,7 @@ class ScipyBaselineRunner(BaselineRunner):
         dimensions: int,
         algorithm: str,
         timeout: int = 604800,
+        nn_file_path: str = None,
     ) -> None:
         self.function_name = function_name
         self.dimensions = dimensions
@@ -49,6 +51,9 @@ class ScipyBaselineRunner(BaselineRunner):
             self.func = Easom(dimensions)
         elif function_name == "Michalewicz":
             self.func = Michalewicz(dimensions)
+        elif function_name == "NeuralNetworkOneLayer":
+            assert nn_file_path is not None, "Must provide nn_file_path."
+            self.func = NeuralNetworkOneLayerTrained(nn_file_path, device="cpu")
         else:
             raise NotImplementedError
     
@@ -112,6 +117,7 @@ class ScipyBaselineRunner(BaselineRunner):
             timer_start = time.time()
             result = opt.brute(func, bounds, full_output=True)
             time_elapsed = time.time() - timer_start
+            timeout_reached = False
         elif algo == "basinhopping":
 
             class MinimizeStopperBasinhopping(object):
@@ -205,6 +211,7 @@ class ScipyBaselineRunner(BaselineRunner):
                 result.success = False
                 result.message = "Timeout reached"
             else:
+                print(return_dict)
                 result = return_dict["opt_result"]
             
         elif algo == "dual_annealing":
