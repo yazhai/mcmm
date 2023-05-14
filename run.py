@@ -1,5 +1,5 @@
 import sys, os, string, random
-import time, json, fcntl
+import time, json, fcntl, traceback
 
 
 from src.test_functions import *
@@ -73,8 +73,9 @@ def mciv_test(config_file):
     try:
         print(f"Start optimization {name} at dim {dims}")
         best_y = alg.optimize(**optimize_args)
-    except:
+    except Exception as e:
         print(f"Optimization {name} at dim {dims} terminated")
+        traceback.print_exc()
         best_y = alg.root.y
     end = time.time()
     eclipsed = end - start

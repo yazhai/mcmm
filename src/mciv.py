@@ -1,4 +1,5 @@
 import copy, time
+
 from typing import Any
 
 import numpy as np
@@ -63,10 +64,8 @@ class MCIV:
             ub = np.array(ub)
         self.ub = ub
         self.dims = len(lb)
-        if self.dims > 50:
-            self.fn = jax_jit(fn)
-        else:
-            self.fn = fn
+
+        self.fn = fn
 
         # Symbolic expression of the function
         self.function_variables = function_variables
@@ -74,8 +73,9 @@ class MCIV:
         if (self.function_variables is None) or (self.function_expression is None):
             try:
                 self.function_variables, self.function_expression = self.fn.expression()
-            except:
-                pass
+            except Exception as e:
+                print("Failed to get symbolic expression of the function")
+                print(str(e))
 
         # logging
         self.log = log
@@ -182,17 +182,37 @@ class MCIV:
         self.time_jit = 0.0
         try:
             start = time.time()
+
+            if self.dims > 50:
+                if self.verbose >= 2:
+                    print("Start jitting function...")
+                self.fn = jax_jit(fn)
+                if self.verbose >= 2:
+                    print("Finish jitting function...")
+
             # jit the function gradient and hessian
+            if self.verbose >= 2:
+                print("start jitting grad ...")
             self._grad_jit = jax_jit(jax_grad(self.fn))
+            if self.verbose >= 2:
+                print("finish jitting grad ...")
+                print("start jitting hessian ...")
             self._hessian_jit = jax_jit(jax_hessian(self.fn))
+            if self.verbose >= 2:
+                print("finish jitting hessian ...")
 
             # test the time for jit as its first call
+            if self.verbose >= 2:
+                print("testing jitted calls ...")
+            self.fn(self.lb)
             self._grad_jit(self.lb)
             self._hessian_jit(self.lb)
+            if self.verbose >= 2:
+                print("finish testing jitted calls ...")
             end = time.time()
             self.time_jit = end - start
-        except:
-            pass
+        except Exception as e:
+            print(f"Failed to jit the function as: {str(e)}")
 
         self.set_parameters(**kwargs)
 
