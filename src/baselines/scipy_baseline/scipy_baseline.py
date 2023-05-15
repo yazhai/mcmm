@@ -4,13 +4,14 @@ import time
 import numpy as np
 from jax import numpy as jnp
 import scipy.optimize as opt
-import scipy
 from scipy.optimize import OptimizeResult
 import typing
 
 import sys
 
-import sys; sys.path.append("../..")
+import sys
+
+sys.path.append("../..")
 from test_functions import (
     TestFunction,
     Levy,
@@ -20,6 +21,11 @@ from test_functions import (
     Easom,
     Michalewicz,
     NeuralNetworkOneLayerTrained,
+    Biggsbi1,
+    Eigenals,
+    Harkerp,
+    Vardim,
+    Watson,
 )
 
 from ..baseline_runner import BaselineRunner
@@ -53,15 +59,24 @@ class ScipyBaselineRunner(BaselineRunner):
             self.func = Easom(dimensions, displacement=displacement)
         elif function_name == "Michalewicz":
             self.func = Michalewicz(dimensions, displacement=displacement)
+        elif function_name == "Biggsbi1":
+            self.func = Biggsbi1(dimensions, displacement=displacement)
+        elif function_name == "Eigenals":
+            self.func = Eigenals(dimensions, displacement=displacement)
+        elif function_name == "Harkerp":
+            self.func = Harkerp(dimensions, displacement=displacement)
+        elif function_name == "Vardim":
+            self.func = Vardim(dimensions, displacement=displacement)
+        elif function_name == "Watson":
+            self.func = Watson(dimensions, displacement=displacement)
         elif function_name == "NeuralNetworkOneLayer":
             assert nn_file_path is not None, "Must provide nn_file_path."
             self.func = NeuralNetworkOneLayerTrained(nn_file_path, device="cpu")
         else:
             raise NotImplementedError
-    
+
         self.timeout = timeout
 
-    
     def run(self) -> dict:
         scipy_result = self.run_scipy_optimization(
             self.func,
@@ -146,7 +161,9 @@ class ScipyBaselineRunner(BaselineRunner):
             start = np.random.uniform(bounds[:, 0], bounds[:, 1])
             timer_start = time.time()
             callback_instance = MinimizeStopperBasinhopping(timeout=timeout)
-            result = opt.basinhopping(func, start, callback=callback_instance)
+            result = opt.basinhopping(
+                func, start, niter=1000, niter_success=1000, callback=callback_instance
+            )
             time_elapsed = time.time() - timer_start
             timeout_reached = callback_instance.timeout_reached
         elif algo == "differential_evolution":
@@ -215,7 +232,7 @@ class ScipyBaselineRunner(BaselineRunner):
             else:
                 print(return_dict)
                 result = return_dict["opt_result"]
-            
+
         elif algo == "dual_annealing":
 
             class MinimizeStopperDualAnnealing(object):
@@ -244,6 +261,38 @@ class ScipyBaselineRunner(BaselineRunner):
             result = opt.dual_annealing(func, bounds, callback=callback_instance)
             time_elapsed = time.time() - timer_start
             timeout_reached = callback_instance.timeout_reached
+
+        elif algo == "simulated_annealing":
+
+            class MinimizeStopperDualAnnealing(object):
+                def __init__(self, timeout=float("inf")):
+                    self.timeout = timeout
+                    self.start = time.time()
+                    self.best_x = None
+                    self.best_obj = float("inf")
+                    self.timeout_reached = False
+
+                def __call__(self, x, f, context):
+                    elapsed = time.time() - self.start
+
+                    if f < self.best_obj:
+                        self.best_x = x
+                        self.best_obj = f
+
+                    if elapsed >= self.timeout:
+                        print("Elapsed time: {}. Timeout reached.".format(elapsed))
+                        self.timeout_reached = True
+                        return True
+
+            bounds = func.get_default_domain()
+            timer_start = time.time()
+            callback_instance = MinimizeStopperDualAnnealing(timeout=timeout)
+            result = opt.dual_annealing(
+                func, bounds, no_local_search=True, callback=callback_instance
+            )
+            time_elapsed = time.time() - timer_start
+            timeout_reached = callback_instance.timeout_reached
+
         elif algo == "direct":
 
             class MinimizeStopperDirect(object):
@@ -277,7 +326,13 @@ class ScipyBaselineRunner(BaselineRunner):
             timer_start = time.time()
             callback_instance = MinimizeStopperDirect(timeout=timeout)
             bounds = [(bounds[i, 0], bounds[i, 1]) for i in range(bounds.shape[0])]
-            result = opt.direct(func, bounds, callback=callback_instance)
+            result = opt.direct(
+                func,
+                bounds,
+                maxiter=100000,
+                locally_biased=False,
+                callback=callback_instance,
+            )
             time_elapsed = time.time() - timer_start
             timeout_reached = callback_instance.timeout_reached
         else:
@@ -326,119 +381,3 @@ class ScipyBaselineRunner(BaselineRunner):
             "records": scipy_result["records"],
         }
         return result_dict
-
-
-def run_scipy_optimization(func: TestFunction, algo: str, seed: int) -> OptimizeResult:
-    np.random.seed(seed)
-
-    if algo == "brute":
-        bounds = func.get_default_domain()
-        result = opt.brute(func, bounds)
-    elif algo == "basinhopping":
-        bounds = func.get_default_domain()
-        start = np.random.uniform(bounds[:, 0], bounds[:, 1])
-        print(start)
-        result = opt.basinhopping(func, start)
-    elif algo == "differential_evolution":
-        bounds = func.get_default_domain()
-        result = opt.differential_evolution(func, bounds)
-    elif algo == "shgo":
-        bounds = func.get_default_domain()
-        result = opt.shgo(func, bounds)
-    elif algo == "dual_annealing":
-        bounds = func.get_default_domain()
-        result = opt.dual_annealing(func, bounds)
-    elif algo == "direct":
-        bounds = func.get_default_domain()
-        result = opt.dual_annealing(func, bounds)
-    else:
-        raise NotImplementedError
-
-    return result
-
-
-def main(args):
-    func_name = args.func
-    dims = args.dims
-    algo = args.algo
-    seed = args.seed
-
-    np.random.seed(seed)
-
-    if func_name == "Levy":
-        func = Levy(dims)
-    elif func_name == "Ackley":
-        func = Ackley(dims)
-    elif func_name == "Dropwave":
-        assert dims == 2, "Dropwave is only defined for 2D."
-        func = Dropwave(dims)
-    elif func_name == "SumSquare":
-        func = SumSquare(dims)
-    elif func_name == "Easom":
-        assert dims == 2, "Easom is only defined for 2D."
-        func = Easom(dims)
-    elif func_name == "Michalewicz":
-        func = Michalewicz(dims)
-    else:
-        raise NotImplementedError
-
-    if algo == "brute":
-        bounds = func.get_default_domain()
-        result = opt.brute(func, bounds)
-    elif algo == "basinhopping":
-        bounds = func.get_default_domain()
-        start = np.random.uniform(bounds[:, 0], bounds[:, 1])
-        print(start)
-        result = opt.basinhopping(func, start)
-    elif algo == "differential_evolution":
-        bounds = func.get_default_domain()
-        result = opt.differential_evolution(func, bounds)
-    elif algo == "shgo":
-        bounds = func.get_default_domain()
-        result = opt.shgo(func, bounds)
-    elif algo == "dual_annealing":
-        bounds = func.get_default_domain()
-        result = opt.dual_annealing(func, bounds)
-    elif algo == "direct":
-        bounds = func.get_default_domain()
-        result = opt.dual_annealing(func, bounds)
-    else:
-        raise NotImplementedError
-
-    print(result)
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--func",
-        type=str,
-        default="SumSquare",
-        choices=["Levy", "Ackley", "Dropwave", "SumSquare", "Easom", "Michalewicz"],
-        help="The function to optimize. Options are: Levy, Ackley, Dropwave, "
-        "SumSquare, Easom, Michalewicz",
-    )
-    parser.add_argument(
-        "--dims",
-        type=int,
-        default=2,
-        help="The number of dimensions of the function to optimize.",
-    )
-    parser.add_argument(
-        "--algo",
-        type=str,
-        default="brute",
-        choices=[
-            "brute",
-            "basinhopping",
-            "differential_evolution",
-            "shgo",
-            "dual_annealing",
-            "direct",
-        ],
-        help="The algorithm to use. Options are: brute, basinhopping, differential_evolution, "
-        "shgo, dual_annealing, direct",
-    )
-    parser.add_argument("--seed", type=int, default=0, help="The random seed to use.")
-    args = parser.parse_args()
-    main(args)

@@ -18,8 +18,11 @@ except ModuleNotFoundError:
 
 import sys
 
-sys.path.append(".")
-from .nlp import *
+try:
+    from .nlp import *
+except:
+    sys.path.append(".")
+    from nlp import *
 
 
 def add_cont_var_unbounded(m: gp.Model, name: str) -> gp.Var:
@@ -874,18 +877,25 @@ class NeuralNetworkOneLayerTrained(NeuralNetworkOneLayer):
 
 
 class Biggsbi1(TestFunction):
-    def __init__(self, dims: int = 1001) -> None:
+    def __init__(self, dims: int = 1001, displacement=None) -> None:
         super().__init__(1001)
+        self.displacement = displacement
+        try:
+            self.displacement[0] = 0.0
+        except:
+            pass
 
     def __call__(self, x: np.ndarray) -> float:
         assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
         assert x.ndim == 1
+        if self.displacement is not None:
+            x = x + self.displacement
         result = biggsbi1(x)
         return result
 
     def get_default_domain(self) -> np.ndarray:
         bounds = np.array([[0, 0.9]] * self.dims)
-        bounds[0] = [0.0, 0.0]
+        # bounds[0] = [0.0, 1e-6]
         return bounds
 
     def expression(self):
@@ -895,18 +905,25 @@ class Biggsbi1(TestFunction):
 
 
 class Eigenals(TestFunction):
-    def __init__(self, dims: int = 111) -> None:
+    def __init__(self, dims: int = 111, displacement=None) -> None:
         super().__init__(111)
+        self.displacement = displacement
+        try:
+            self.displacement[0] = 0.0
+        except:
+            pass
 
     def __call__(self, x: np.ndarray) -> float:
         assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
         assert x.ndim == 1
+        if self.displacement is not None:
+            x = x + self.displacement
         result = eigenals(x)
         return result
 
     def get_default_domain(self) -> np.ndarray:
         bounds = np.array([[-10.0, 10.0]] * self.dims)
-        bounds[0] = [0.0, 0.0]
+        # bounds[0] = [0.0, 1.0e-6]
         return bounds
 
     def expression(self):
@@ -916,18 +933,25 @@ class Eigenals(TestFunction):
 
 
 class Harkerp(TestFunction):
-    def __init__(self, dims: int = 101) -> None:
+    def __init__(self, dims: int = 101, displacement=None) -> None:
         super().__init__(101)
+        self.displacement = displacement
+        try:
+            self.displacement[0] = 0.0
+        except:
+            pass
 
     def __call__(self, x: np.ndarray) -> float:
         assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
         assert x.ndim == 1
+        if self.displacement is not None:
+            x = x + self.displacement
         result = harkper(x)
         return result
 
     def get_default_domain(self) -> np.ndarray:
         bounds = np.array([[0.0, 10.0]] * self.dims)
-        bounds[0] = [0.0, 0.0]
+        # bounds[0] = [0.0, 1.0e-6]
         return bounds
 
     def expression(self):
@@ -937,18 +961,25 @@ class Harkerp(TestFunction):
 
 
 class Vardim(TestFunction):
-    def __init__(self, dims: int = 101) -> None:
+    def __init__(self, dims: int = 101, displacement=None) -> None:
         super().__init__(101)
+        self.displacement = displacement
+        try:
+            self.displacement[0] = 0.0
+        except:
+            pass
 
     def __call__(self, x: np.ndarray) -> float:
         assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
         assert x.ndim == 1
+        if self.displacement is not None:
+            x = x + self.displacement
         result = vardim(x)
         return result
 
     def get_default_domain(self) -> np.ndarray:
         bounds = np.array([[-10.0, 10.0]] * self.dims)
-        bounds[0] = [0.0, 0.0]
+        # bounds[0] = [0.0, 1.0e-6]
         return bounds
 
     def expression(self):
@@ -958,18 +989,25 @@ class Vardim(TestFunction):
 
 
 class Watson(TestFunction):
-    def __init__(self, dims: int = 32) -> None:
+    def __init__(self, dims: int = 32, displacement=None) -> None:
         super().__init__(32)
+        self.displacement = displacement
+        try:
+            self.displacement[0] = 0.0
+        except:
+            pass
 
     def __call__(self, x: np.ndarray) -> float:
         assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
         assert x.ndim == 1
+        if self.displacement is not None:
+            x = x + self.displacement
         result = watson(x)
         return result
 
     def get_default_domain(self) -> np.ndarray:
         bounds = np.array([[-10.0, 10.0]] * self.dims)
-        bounds[0] = [0.0, 0.0]
+        # bounds[0] = [0.0, 1.0e-6]
         return bounds
 
     def expression(self):

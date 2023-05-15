@@ -1,0 +1,180 @@
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo brute --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo brute --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo shgo --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo shgo --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo dual_annealing --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo dual_annealing --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo direct --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo direct --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo brute --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo brute --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo shgo --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo shgo --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo dual_annealing --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo dual_annealing --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo direct --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo direct --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo brute --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo brute --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo shgo --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo shgo --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo dual_annealing --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo dual_annealing --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo direct --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo direct --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo brute --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo brute --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo shgo --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo shgo --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo dual_annealing --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo dual_annealing --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo direct --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo direct --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo brute --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo brute --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo shgo --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo shgo --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo dual_annealing --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo dual_annealing --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Watson --dims 32 --solver scipy --algo direct --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Watson --dims 32 --solver scipy --algo direct --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo brute --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo brute --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo shgo --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo shgo --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo dual_annealing --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo dual_annealing --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo direct --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo direct --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo brute --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo brute --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo shgo --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo shgo --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo dual_annealing --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo dual_annealing --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo direct --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo direct --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo brute --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo brute --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo shgo --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo shgo --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo dual_annealing --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo dual_annealing --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo direct --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo direct --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo brute --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo brute --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo shgo --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo shgo --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo dual_annealing --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo dual_annealing --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo direct --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo direct --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo brute --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo brute --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo shgo --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo shgo --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo dual_annealing --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo dual_annealing --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo direct --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Biggsbi1 --dims 1001 --solver scipy --algo direct --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo brute --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo brute --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo shgo --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo shgo --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo dual_annealing --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo dual_annealing --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo direct --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo direct --seed 0 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo brute --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo brute --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo shgo --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo shgo --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo dual_annealing --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo dual_annealing --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo direct --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo direct --seed 1 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo brute --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo brute --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo shgo --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo shgo --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo dual_annealing --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo dual_annealing --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo direct --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo direct --seed 2 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo brute --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo brute --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo shgo --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo shgo --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo dual_annealing --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo dual_annealing --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo direct --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo direct --seed 3 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo brute --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo brute --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo shgo --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo shgo --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo dual_annealing --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo dual_annealing --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600
+echo 'python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo direct --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600'
+python run_baseline.py --func Harkerp --dims 101 --solver scipy --algo direct --seed 4 --output_dir baseline_results_nlp/ --displacement -0.61 --timeout 3600

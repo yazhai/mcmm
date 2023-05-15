@@ -17,9 +17,22 @@ parser.add_argument(
     "--func",
     type=str,
     default="SumSquare",
-    choices=["Levy", "Ackley", "Dropwave", "SumSquare", "Easom", "Michalewicz", "NeuralNetworkOneLayer"],
+    choices=[
+        "Levy",
+        "Ackley",
+        "Dropwave",
+        "SumSquare",
+        "Easom",
+        "Michalewicz",
+        "NeuralNetworkOneLayer",
+        "Biggsbi1",
+        "Eigenals",
+        "Harkerp",
+        "Vardim",
+        "Watson",
+    ],
     help="The function to optimize. Options are: Levy, Ackley, Dropwave, "
-    "SumSquare, Easom, Michalewicz",
+    "SumSquare, Easom, Michalewicz, Biggsbi1, Eigenals, Harkerp, Vardim, Watson",
 )
 parser.add_argument(
     "--dims",
@@ -44,11 +57,12 @@ parser.add_argument(
         "differential_evolution",
         "shgo",
         "dual_annealing",
+        "simulated_annealing",
         "direct",
         "none",
     ],
     help="The algorithm to use. Options are: brute, basinhopping, differential_evolution, "
-    "shgo, dual_annealing, direct. If solver is gurobi, then this is ignored.",
+    "shgo, dual_annealing, simulated_annealing, direct. If solver is gurobi, then this is ignored.",
 )
 parser.add_argument("--timeout", type=int, default=300, help="The timeout in seconds.")
 parser.add_argument("--seed", type=int, default=0, help="The random seed to use.")
@@ -65,10 +79,10 @@ parser.add_argument(
     help="Rerun if output exists.",
 )
 parser.add_argument(
-    "--nn_file_path", 
-    type=str, 
-    default=None, 
-    help="The path to the neural network data file."
+    "--nn_file_path",
+    type=str,
+    default=None,
+    help="The path to the neural network data file.",
 )
 parser.add_argument(
     "--displacement",
@@ -91,10 +105,10 @@ def get_output_fname(args):
         fname = f"{args.func}_{args.dims}_{args.solver}_{args.seed}"
     else:
         raise ValueError(f"Unknown solver {args.solver}")
-    
+
     if args.func == "NeuralNetworkOneLayer":
         fname += f"-{args.nn_file_path.split('/')[-1].split('.')[0]}"
-    
+
     return fname
 
 
@@ -129,10 +143,17 @@ try:
     if args.solver == "scipy":
         assert args.algo != "none", "If solver is scipy, then algo must be specified."
         runner = ScipyBaselineRunner(
-            args.func, args.dims, args.algo, timeout=args.timeout, nn_file_path=args.nn_file_path, displacement=args.displacement
+            args.func,
+            args.dims,
+            args.algo,
+            timeout=args.timeout,
+            nn_file_path=args.nn_file_path,
+            displacement=args.displacement,
         )
     elif args.solver == "gurobi":
-        runner = GurobiBaselineRunner(args.func, args.dims, args.algo, displacement=args.displacement)
+        runner = GurobiBaselineRunner(
+            args.func, args.dims, args.algo, displacement=args.displacement
+        )
 
     result_dict = runner.run()
 
