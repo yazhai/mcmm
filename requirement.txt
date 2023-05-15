@@ -1,5 +1,5 @@
 # First, install with conda env
-# conda install --file requirement.txt -c conda-forge -c anaconda -c benensta -c pytorch -c default
+# conda install --file requirement.txt -c conda-forge -c anaconda -c benensta -c pytorch -c gurobi -c default
 python=3.9
 jax
 scipy
@@ -8,6 +8,7 @@ pytorch
 torchvision
 torchaudio
 tqdm
+gurobi
 
 # Second, install with pyibex with pip
 # pip install pyibex

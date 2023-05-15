@@ -1,4 +1,12 @@
-from test_functions import Levy, Ackley, Dropwave, SumSquare, Michalewicz, NeuralNetworkOneLayer
+from test_functions import (
+    Levy,
+    Ackley,
+    Dropwave,
+    SumSquare,
+    Michalewicz,
+    NeuralNetworkOneLayer,
+    Eigenals,
+)
 
 import random
 import torch
@@ -7,9 +15,11 @@ import numpy as np
 from tqdm import tqdm
 
 import os
+
 os.environ["XLA_PYTHON_CLIENT_MEM_FRACTION"] = ".20"
 
 import argparse
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--input_dims", type=int, default=2)
 parser.add_argument("--hidden_dims", type=int, default=16)
@@ -54,6 +64,8 @@ elif args.test_function.lower() == "sumsquare":
     gt_func = SumSquare(dims=input_dims)
 elif args.test_function.lower() == "michalewicz":
     gt_func = Michalewicz(dims=input_dims)
+elif args.test_function.lower() == "eigenals":
+    gt_func = Eigenals(dims=input_dims)
 else:
     raise ValueError(f"Unknown test function: {args.test_function}")
 
@@ -94,9 +106,9 @@ for epoch in tqdm(range(num_epochs)):
     ys_shuffled = ys[shuffled_indices]
 
     for i in range(0, num_smaples, batch_size):
-        x = torch.FloatTensor(xs_shuffled[i:i+batch_size])
-        y = torch.FloatTensor(ys_shuffled[i:i+batch_size])
-        
+        x = torch.FloatTensor(xs_shuffled[i : i + batch_size])
+        y = torch.FloatTensor(ys_shuffled[i : i + batch_size])
+
         x = x.to(device)
         y = y.to(device)
 
@@ -110,12 +122,12 @@ for epoch in tqdm(range(num_epochs)):
 nn.model.eval()
 losses = []
 for i in range(0, num_smaples, batch_size):
-    x = torch.FloatTensor(xs[i:i+batch_size])
-    y = torch.FloatTensor(ys[i:i+batch_size])
-    
+    x = torch.FloatTensor(xs[i : i + batch_size])
+    y = torch.FloatTensor(ys[i : i + batch_size])
+
     x = x.to(device)
     y = y.to(device)
-    
+
     with torch.no_grad():
         y_pred = nn.model(x)
     loss = criteria(y_pred, y)
@@ -132,4 +144,7 @@ model_info = {
     "bounds": bounds,
     "state_dict": nn.model.state_dict(),
 }
-torch.save(model_info, f"nn_models/nn_one_layer_{args.test_function}_{args.input_dims}_{args.hidden_dims}.pt")
+torch.save(
+    model_info,
+    f"nn_models/nn_one_layer_{args.test_function}_{args.input_dims}_{args.hidden_dims}.pt",
+)

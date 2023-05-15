@@ -16,14 +16,20 @@ try:
 except ModuleNotFoundError:
     print("Importing error: Gurobi not found.")
 
-import sys; sys.path.append(".")
-from nlp import *
+import sys
+
+sys.path.append(".")
+from .nlp import *
 
 
 def add_cont_var_unbounded(m: gp.Model, name: str) -> gp.Var:
     return m.addVar(lb=float("-inf"), ub=float("inf"), vtype=GRB.CONTINUOUS, name=name)
+
+
 def add_cont_var_positive(m: gp.Model, name: str) -> gp.Var:
     return m.addVar(lb=0, ub=float("inf"), vtype=GRB.CONTINUOUS, name=name)
+
+
 def add_cont_var_negative(m: gp.Model, name: str) -> gp.Var:
     return m.addVar(lb=float("-inf"), ub=0, vtype=GRB.CONTINUOUS, name=name)
 
@@ -59,7 +65,7 @@ class TestFunction:
             return lb, ub
         except:
             raise NotImplementedError
-    
+
     def clear_records(self):
         self.records_X = []
         self.records_Y = []
@@ -229,7 +235,9 @@ class Levy(TestFunction):
             displaced_x = []
             for i in range(self.dims):
                 displaced_x.append(add_cont_var_unbounded(m, "displaced_x" + str(i)))
-                m.addConstr(displaced_x[i] == x[i] + self.displacement, "displaced_x" + str(i))
+                m.addConstr(
+                    displaced_x[i] == x[i] + self.displacement, "displaced_x" + str(i)
+                )
             x = displaced_x
 
         w = []
@@ -297,7 +305,6 @@ class Levy(TestFunction):
         return m
 
 
-
 class Ackley(TestFunction):
     def __init__(self, dims: int = 2, displacement=None) -> None:
         super().__init__(dims)
@@ -328,7 +335,9 @@ class Ackley(TestFunction):
         return np.array([[-32.768, 32.768]] * self.dims)
 
     def expression(self):
-        assert self.displacement is None, "Expressions is not implemented for displacement"
+        assert (
+            self.displacement is None
+        ), "Expressions is not implemented for displacement"
         dims = self.dims
         a = self.a
         b = self.b
@@ -401,7 +410,9 @@ class Ackley(TestFunction):
             displaced_x = []
             for i in range(self.dims):
                 displaced_x.append(add_cont_var_unbounded(m, "displaced_x" + str(i)))
-                m.addConstr(displaced_x[i] == x[i] + self.displacement, "displaced_x" + str(i))
+                m.addConstr(
+                    displaced_x[i] == x[i] + self.displacement, "displaced_x" + str(i)
+                )
             x = displaced_x
 
         # First term
@@ -435,8 +446,8 @@ class Ackley(TestFunction):
             m.addConstr(cos_in == self.c * x[d], "cos_in" + str(d))
             m.addGenConstrCos(cos_in, cos_out, "cos_out" + str(d))
             cos_summation += cos_out
-        
-        exp_2_in = m.addVar(lb=-1., ub=1., vtype=GRB.CONTINUOUS, name="exp_2_in")
+
+        exp_2_in = m.addVar(lb=-1.0, ub=1.0, vtype=GRB.CONTINUOUS, name="exp_2_in")
         # exp_2_in = add_cont_var_positive(m, "exp_2_in")
         exp_2_out = add_cont_var_positive(m, "exp_2_out")
 
@@ -525,7 +536,9 @@ class SumSquare(TestFunction):
     def expression(self):
         dims = self.dims
 
-        assert self.displacement is None, "Expression not implemented for displaced function"
+        assert (
+            self.displacement is None
+        ), "Expression not implemented for displaced function"
 
         x = [f"x[{i}]" for i in range(dims)]
 
@@ -552,9 +565,10 @@ class SumSquare(TestFunction):
             displaced_x = []
             for i in range(self.dims):
                 displaced_x.append(add_cont_var_unbounded(m, "displaced_x" + str(i)))
-                m.addConstr(displaced_x[i] == x[i] + self.displacement, "displaced_x" + str(i))
+                m.addConstr(
+                    displaced_x[i] == x[i] + self.displacement, "displaced_x" + str(i)
+                )
             x = displaced_x
-
 
         summation = 0
         # Loop thorugh to get summation of all terms
@@ -632,7 +646,9 @@ class Michalewicz(TestFunction):
         return np.array([[0, np.pi]] * self.dims)
 
     def expression(self):
-        assert self.displacement is None, "Expression not implemented for displaced function"
+        assert (
+            self.displacement is None
+        ), "Expression not implemented for displaced function"
 
         dims = self.dims
         x = [f"x[{i}]" for i in range(dims)]
@@ -663,7 +679,9 @@ class Michalewicz(TestFunction):
             displaced_x = []
             for i in range(self.dims):
                 displaced_x.append(add_cont_var_unbounded(m, "displaced_x" + str(i)))
-                m.addConstr(displaced_x[i] == x[i] + self.displacement, "displaced_x" + str(i))
+                m.addConstr(
+                    displaced_x[i] == x[i] + self.displacement, "displaced_x" + str(i)
+                )
             x = displaced_x
 
         summation = 0
@@ -682,7 +700,9 @@ class Michalewicz(TestFunction):
             m.addGenConstrSin(sin_2_in, sin_2_in_out, "sin_2_in_out" + str(i))
 
             sin_2_out_squraed = add_cont_var_positive(m, "sin_2_out_squraed" + str(i))
-            m.addConstr(sin_2_out_squraed == sin_2_in_out ** 2, "sin_2_out_squraed" + str(i))
+            m.addConstr(
+                sin_2_out_squraed == sin_2_in_out**2, "sin_2_out_squraed" + str(i)
+            )
 
             pow_in = add_cont_var_positive(m, "pow_in" + str(i))
             pow_out = add_cont_var_positive(m, "pow_out" + str(i))
@@ -698,7 +718,6 @@ class Michalewicz(TestFunction):
         m.params.NonConvex = 2
 
         return m
-
 
 
 class NeuralNetworkOneLayer(TestFunction):
