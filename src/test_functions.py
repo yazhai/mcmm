@@ -895,7 +895,7 @@ class Biggsbi1(TestFunction):
 
     def get_default_domain(self) -> np.ndarray:
         bounds = np.array([[0, 0.9]] * self.dims)
-        bounds[0] = [0.0, 1e-6]
+        # bounds[0] = [0.0, 1e-6]
         return bounds
 
     def expression(self):
@@ -923,7 +923,7 @@ class Eigenals(TestFunction):
 
     def get_default_domain(self) -> np.ndarray:
         bounds = np.array([[-10.0, 10.0]] * self.dims)
-        bounds[0] = [0.0, 1.0e-6]
+        # bounds[0] = [0.0, 1.0e-6]
         return bounds
 
     def expression(self):
@@ -951,7 +951,7 @@ class Harkerp(TestFunction):
 
     def get_default_domain(self) -> np.ndarray:
         bounds = np.array([[0.0, 10.0]] * self.dims)
-        bounds[0] = [0.0, 1.0e-6]
+        # bounds[0] = [0.0, 1.0e-6]
         return bounds
 
     def expression(self):
@@ -979,7 +979,7 @@ class Vardim(TestFunction):
 
     def get_default_domain(self) -> np.ndarray:
         bounds = np.array([[-10.0, 10.0]] * self.dims)
-        bounds[0] = [0.0, 1.0e-6]
+        # bounds[0] = [0.0, 1.0e-6]
         return bounds
 
     def expression(self):
@@ -1007,7 +1007,7 @@ class Watson(TestFunction):
 
     def get_default_domain(self) -> np.ndarray:
         bounds = np.array([[-10.0, 10.0]] * self.dims)
-        bounds[0] = [0.0, 1.0e-6]
+        # bounds[0] = [0.0, 1.0e-6]
         return bounds
 
     def expression(self):
