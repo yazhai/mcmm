@@ -136,11 +136,12 @@ try:
 
     result_dict = runner.run()
 
-    filename_record_X = "{}_X.npy".format(get_output_fname(args))
-    filename_record_Y = "{}_Y.npy".format(get_output_fname(args))
-    np.save(os.path.join(record_dir, filename_record_X), result_dict["records"][0])
-    np.save(os.path.join(record_dir, filename_record_Y), result_dict["records"][1])
-    del result_dict["records"]
+    if "records" in result_dict:
+        filename_records_X = "{}_X.npy".format(get_output_fname(args))
+        filename_records_Y = "{}_Y.npy".format(get_output_fname(args))
+        np.save(os.path.join(record_dir, filename_records_X), result_dict["records"][0])
+        np.save(os.path.join(record_dir, filename_records_Y), result_dict["records"][1])
+        del result_dict["records"]
 
     filename_raw = "{}.pickle".format(get_output_fname(args))
     with open(os.path.join(raw_dir, filename_raw), "wb") as f:
