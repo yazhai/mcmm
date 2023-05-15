@@ -70,7 +70,12 @@ parser.add_argument(
     default=None, 
     help="The path to the neural network data file."
 )
-
+parser.add_argument(
+    "--displacement",
+    type=float,
+    default=None,
+    help="The displacement in x to use for evaluating functions",
+)
 
 args = parser.parse_args()
 
@@ -107,6 +112,8 @@ raw_dir = os.path.join(output_dir, "raw")
 os.makedirs(raw_dir, exist_ok=True)
 err_dir = os.path.join(output_dir, "err")
 os.makedirs(err_dir, exist_ok=True)
+record_dir = os.path.join(output_dir, "record")
+os.makedirs(record_dir, exist_ok=True)
 
 res_fp = os.path.join(result_dir, "{}.json".format(get_output_fname(args)))
 raw_fp = os.path.join(raw_dir, "{}.pickle".format(get_output_fname(args)))
@@ -122,12 +129,18 @@ try:
     if args.solver == "scipy":
         assert args.algo != "none", "If solver is scipy, then algo must be specified."
         runner = ScipyBaselineRunner(
-            args.func, args.dims, args.algo, timeout=args.timeout, nn_file_path=args.nn_file_path
+            args.func, args.dims, args.algo, timeout=args.timeout, nn_file_path=args.nn_file_path, displacement=args.displacement
         )
     elif args.solver == "gurobi":
-        runner = GurobiBaselineRunner(args.func, args.dims, args.algo)
+        runner = GurobiBaselineRunner(args.func, args.dims, args.algo, displacement=args.displacement)
 
     result_dict = runner.run()
+
+    filename_record_X = "{}_X.npy".format(get_output_fname(args))
+    filename_record_Y = "{}_Y.npy".format(get_output_fname(args))
+    np.save(os.path.join(record_dir, filename_record_X), result_dict["records"][0])
+    np.save(os.path.join(record_dir, filename_record_Y), result_dict["records"][1])
+    del result_dict["records"]
 
     filename_raw = "{}.pickle".format(get_output_fname(args))
     with open(os.path.join(raw_dir, filename_raw), "wb") as f:

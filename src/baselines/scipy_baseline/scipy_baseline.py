@@ -10,7 +10,8 @@ import typing
 
 import sys
 
-from ..test_functions import (
+import sys; sys.path.append("../..")
+from test_functions import (
     TestFunction,
     Levy,
     Ackley,
@@ -33,24 +34,25 @@ class ScipyBaselineRunner(BaselineRunner):
         algorithm: str,
         timeout: int = 604800,
         nn_file_path: str = None,
+        displacement: float = None,
     ) -> None:
         self.function_name = function_name
         self.dimensions = dimensions
         self.algorithm = algorithm
 
         if function_name == "Levy":
-            self.func = Levy(dimensions)
+            self.func = Levy(dimensions, displacement=displacement)
         elif function_name == "Ackley":
-            self.func = Ackley(dimensions)
+            self.func = Ackley(dimensions, displacement=displacement)
         elif function_name == "Dropwave":
-            self.func = Dropwave(dimensions)
+            self.func = Dropwave(dimensions, displacement=displacement)
         elif function_name == "SumSquare":
-            self.func = SumSquare(dimensions)
+            self.func = SumSquare(dimensions, displacement=displacement)
         elif function_name == "Easom":
             assert dimensions == 2, "Easom is only defined for 2D."
-            self.func = Easom(dimensions)
+            self.func = Easom(dimensions, displacement=displacement)
         elif function_name == "Michalewicz":
-            self.func = Michalewicz(dimensions)
+            self.func = Michalewicz(dimensions, displacement=displacement)
         elif function_name == "NeuralNetworkOneLayer":
             assert nn_file_path is not None, "Must provide nn_file_path."
             self.func = NeuralNetworkOneLayerTrained(nn_file_path, device="cpu")
@@ -285,6 +287,7 @@ class ScipyBaselineRunner(BaselineRunner):
             "optimize_result": result,
             "time_elapsed": time_elapsed,
             "timeout_reached": timeout_reached,
+            "records": func.get_np_records(),
         }
 
     @staticmethod
@@ -320,6 +323,7 @@ class ScipyBaselineRunner(BaselineRunner):
             "time_elapsed": scipy_result["time_elapsed"],
             "timeout_reached": scipy_result["timeout_reached"],
             "raw_output": raw_output,
+            "records": scipy_result["records"],
         }
         return result_dict
 

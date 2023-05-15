@@ -2,9 +2,9 @@ import gurobipy as gp
 from gurobipy import GRB
 
 
-# import sys; sys.path.append("../..")
+import sys; sys.path.append("../..")
 
-from ..test_functions import (
+from test_functions import (
     TestFunction,
     Levy,
     Ackley,
@@ -18,24 +18,24 @@ from ..baseline_runner import BaselineRunner
 
 
 class GurobiBaselineRunner(BaselineRunner):
-    def __init__(self, function_name: str, dimensions: int, algorithm: str) -> None:
+    def __init__(self, function_name: str, dimensions: int, algorithm: str, displacement: float = None) -> None:
         self.function_name = function_name
         self.dimensions = dimensions
         self.algorithm = algorithm
 
         if function_name == "Levy":
-            self.func = Levy(dimensions)
+            self.func = Levy(dimensions, displacement=displacement)
         elif function_name == "Ackley":
-            self.func = Ackley(dimensions)
+            self.func = Ackley(dimensions, displacement=displacement)
         elif function_name == "Dropwave":
-            self.func = Dropwave(dimensions)
+            self.func = Dropwave(dimensions, displacement=displacement)
         elif function_name == "SumSquare":
-            self.func = SumSquare(dimensions)
+            self.func = SumSquare(dimensions, displacement=displacement)
         elif function_name == "Easom":
             assert dimensions == 2, "Easom is only defined for 2D."
-            self.func = Easom(dimensions)
+            self.func = Easom(dimensions, displacement=displacement)
         elif function_name == "Michalewicz":
-            self.func = Michalewicz(dimensions)
+            self.func = Michalewicz(dimensions, displacement=displacement)
         else:
             raise NotImplementedError
 
