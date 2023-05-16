@@ -228,7 +228,7 @@ class ScipyBaselineRunner(BaselineRunner):
             timer_start = time.time()
             callback_instance = MinimizeStopperDifferentialEvolution(timeout=timeout)
             result = opt.differential_evolution(
-                func, bounds, callback=callback_instance
+                func, bounds, maxiter=1000000, callback=callback_instance
             )
             time_elapsed = time.time() - timer_start
             timeout_reached = callback_instance.timeout_reached
