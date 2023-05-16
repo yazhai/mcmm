@@ -40,8 +40,6 @@ def add_cont_var_negative(m: gp.Model, name: str) -> gp.Var:
 class TestFunction:
     def __init__(self, dims: int = 2) -> None:
         self.dims = dims  #
-        self.records_X = []
-        self.records_Y = []
 
     def __call__(self, x: np.ndarray) -> float:
         raise NotImplementedError
@@ -68,13 +66,6 @@ class TestFunction:
             return lb, ub
         except:
             raise NotImplementedError
-
-    def clear_records(self):
-        self.records_X = []
-        self.records_Y = []
-
-    def get_np_records(self):
-        return np.array(self.records_X), np.array(self.records_Y)
 
 
 class ToyObjective(TestFunction):
@@ -147,8 +138,6 @@ class Levy(TestFunction):
         assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
         assert x.ndim == 1
 
-        self.records_X.append(x)
-
         if self.displacement is not None:
             x = x + self.displacement
 
@@ -166,7 +155,6 @@ class Levy(TestFunction):
 
         result = term1 + term2 + term3
 
-        self.records_Y.append(result)
         return result
 
     def get_default_domain(self) -> np.ndarray:
@@ -320,8 +308,6 @@ class Ackley(TestFunction):
         assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
         assert x.ndim == 1
 
-        self.records_X.append(x)
-
         if self.displacement is not None:
             x = x + self.displacement
 
@@ -331,7 +317,6 @@ class Ackley(TestFunction):
 
         result = term1 + term2 + self.a + jnp.exp(1)
 
-        self.records_Y.append(result)
         return result
 
     def get_default_domain(self) -> np.ndarray:
@@ -478,8 +463,6 @@ class Dropwave(TestFunction):
         assert x.ndim == 1
         assert len(x) == self.dims
 
-        self.records_X.append(x)
-
         if self.displacement is not None:
             x = x + self.displacement
 
@@ -489,7 +472,6 @@ class Dropwave(TestFunction):
 
         result = -term1 / term2
 
-        self.records_Y.append(result)
         return result
 
     def get_default_domain(self) -> np.ndarray:
@@ -521,8 +503,6 @@ class SumSquare(TestFunction):
         assert x.ndim == 1
         assert len(x) == self.dims
 
-        self.records_X.append(x)
-
         if self.displacement is not None:
             x = x + self.displacement
 
@@ -530,7 +510,6 @@ class SumSquare(TestFunction):
 
         result = jnp.sum(coef * (x**2))
 
-        self.records_Y.append(result)
         return result
 
     def get_default_domain(self) -> np.ndarray:
@@ -595,10 +574,7 @@ class Easom(TestFunction):
         assert x.ndim == 1
         assert len(x) == self.dims
 
-        self.records_X.append(x)
-
         result = -jnp.prod(jnp.cos(x)) * jnp.exp(-jnp.sum((x - np.pi) ** 2))
-        self.records_Y.append(result)
         return result
 
     def get_default_domain(self) -> np.ndarray:
@@ -631,8 +607,6 @@ class Michalewicz(TestFunction):
         assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
         assert x.ndim == 1
 
-        self.records_X.append(x)
-
         if self.displacement is not None:
             x = x + self.displacement
 
@@ -642,7 +616,6 @@ class Michalewicz(TestFunction):
         m_term = jnp.sin((x**2) * index_term / np.pi) ** (2 * self.m)
 
         result = -jnp.sum(sin_term * m_term)
-        self.records_Y.append(result)
         return result
 
     def get_default_domain(self) -> np.ndarray:
@@ -751,8 +724,6 @@ class NeuralNetworkOneLayer(TestFunction):
         assert isinstance(x, np.ndarray) or isinstance(x, jnp.ndarray)
         assert x.ndim == 1
 
-        self.records_X.append(x)
-
         # nn_in = torch.FloatTensor(x).to(self.device)
         # with torch.no_grad():
         #     nn_out = self.model(nn_in)
@@ -777,7 +748,6 @@ class NeuralNetworkOneLayer(TestFunction):
 
         result = x[0][0]
 
-        self.records_Y.append(result)
         return result
 
     def get_default_domain(self) -> np.ndarray:

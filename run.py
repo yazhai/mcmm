@@ -20,18 +20,25 @@ def mciv_test(config_file):
         model = config.get("objective", {}).get("model", None)
         if model is None:
             raise ValueError("NN pretrained model is not specified")
-        obj_args = model
+        obj = model
         name = os.path.basename(model).split(".")[0]
 
     # define for normal objective functions
     else:
         fn_class = eval(fn_class)
         dims = config.get("objective", {}).get("dims", 2)
-        obj_args = dims
+        obj = dims
         name = fn_class.__name__
 
     lb = config.get("objective", {}).get("lb", None)
     ub = config.get("objective", {}).get("ub", None)
+
+    obj_args = config.get("objective", {})
+    obj_args.pop("function", None)
+    obj_args.pop("model", None)
+    obj_args.pop("dims", None)
+    obj_args.pop("lb", None)
+    obj_args.pop("ub", None)
     init_args = config.get("initial", {})
     optimize_args = config.get("optimize", {})
 
@@ -63,7 +70,7 @@ def mciv_test(config_file):
 
     # ===========================================================================
     # run the optimization
-    fn = fn_class(obj_args)
+    fn = fn_class(obj, **obj_args)
     if (lb is None) or (ub is None):
         lb, ub = fn.get_default_bounds()
 
