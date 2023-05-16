@@ -31,6 +31,29 @@ from test_functions import (
 from ..baseline_runner import BaselineRunner
 
 
+class TrackerDecorator:
+    def __init__(self, func: TestFunction) -> None:
+        self.func = func
+        self.records_X = []
+        self.records_Y = []
+
+    def __getattr__(self, name):
+        return getattr(self.func, name)
+
+    def __call__(self, xk):
+        y = self.func(xk)
+        self.records_X.append(xk)
+        self.records_Y.append(y)
+        return y
+
+    def clear_records(self):
+        self.records_X = []
+        self.records_Y = []
+
+    def get_np_records(self):
+        return np.array(self.records_X), np.array(self.records_Y)
+
+
 class ScipyBaselineRunner(BaselineRunner):
     # Default timeout to 1 week
     def __init__(
@@ -47,28 +70,38 @@ class ScipyBaselineRunner(BaselineRunner):
         self.algorithm = algorithm
 
         if function_name == "Levy":
-            self.func = Levy(dimensions, displacement=displacement)
+            self.func = TrackerDecorator(Levy(dimensions, displacement=displacement))
         elif function_name == "Ackley":
-            self.func = Ackley(dimensions, displacement=displacement)
+            self.func = TrackerDecorator(Ackley(dimensions, displacement=displacement))
         elif function_name == "Dropwave":
-            self.func = Dropwave(dimensions, displacement=displacement)
+            self.func = TrackerDecorator(
+                Dropwave(dimensions, displacement=displacement)
+            )
         elif function_name == "SumSquare":
-            self.func = SumSquare(dimensions, displacement=displacement)
+            self.func = TrackerDecorator(
+                SumSquare(dimensions, displacement=displacement)
+            )
         elif function_name == "Easom":
             assert dimensions == 2, "Easom is only defined for 2D."
-            self.func = Easom(dimensions, displacement=displacement)
+            self.func = TrackerDecorator(Easom(dimensions, displacement=displacement))
         elif function_name == "Michalewicz":
-            self.func = Michalewicz(dimensions, displacement=displacement)
+            self.func = TrackerDecorator(
+                Michalewicz(dimensions, displacement=displacement)
+            )
         elif function_name == "Biggsbi1":
-            self.func = Biggsbi1(dimensions, displacement=displacement)
+            self.func = TrackerDecorator(
+                Biggsbi1(dimensions, displacement=displacement)
+            )
         elif function_name == "Eigenals":
-            self.func = Eigenals(dimensions, displacement=displacement)
+            self.func = TrackerDecorator(
+                Eigenals(dimensions, displacement=displacement)
+            )
         elif function_name == "Harkerp":
-            self.func = Harkerp(dimensions, displacement=displacement)
+            self.func = TrackerDecorator(Harkerp(dimensions, displacement=displacement))
         elif function_name == "Vardim":
-            self.func = Vardim(dimensions, displacement=displacement)
+            self.func = TrackerDecorator(Vardim(dimensions, displacement=displacement))
         elif function_name == "Watson":
-            self.func = Watson(dimensions, displacement=displacement)
+            self.func = TrackerDecorator(Watson(dimensions, displacement=displacement))
         elif function_name == "NeuralNetworkOneLayer":
             assert nn_file_path is not None, "Must provide nn_file_path."
             self.func = NeuralNetworkOneLayerTrained(nn_file_path, device="cpu")
