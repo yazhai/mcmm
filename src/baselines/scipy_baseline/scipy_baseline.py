@@ -104,7 +104,7 @@ class ScipyBaselineRunner(BaselineRunner):
             self.func = TrackerDecorator(Watson(dimensions, displacement=displacement))
         elif function_name == "NeuralNetworkOneLayer":
             assert nn_file_path is not None, "Must provide nn_file_path."
-            self.func = NeuralNetworkOneLayerTrained(nn_file_path, device="cpu")
+            self.func = TrackerDecorator(NeuralNetworkOneLayerTrained(nn_file_path, device="cpu"))
         else:
             raise NotImplementedError
 
