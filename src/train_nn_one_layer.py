@@ -144,7 +144,13 @@ model_info = {
     "bounds": bounds,
     "state_dict": nn.model.state_dict(),
 }
+
+if args.num_epochs == 0 or args.num_samples == 0:
+    nn_filepath = f"nn_models/nn_one_layer_notraining_{args.input_dims}_{args.hidden_dims}.pt"
+else:
+    nn_filepath = f"nn_models/nn_one_layer_{args.test_function}_{args.input_dims}_{args.hidden_dims}.pt"
+
 torch.save(
     model_info,
-    f"nn_models/nn_one_layer_{args.test_function}_{args.input_dims}_{args.hidden_dims}.pt",
+    nn_filepath,
 )

@@ -4,3 +4,5 @@ test/
 **/__pycache__/
 **/.vscode/
 *json
+
+**result_df.pkl
