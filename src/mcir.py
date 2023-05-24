@@ -31,25 +31,15 @@ class MCIR:
         root=None,
         log="./log.dat",
         verbose=0,  # Run-time information level, 0: no info, 1: summary, 2: run time info, 3: entire tree info
-        batch_size=1,  # Number of function evaluations at the same time
         max_iterations=10,  # Number of total iterations
         n_opt_local=0,  # Number of allowed function calls in local opt in every iteration
         num_node_expand="auto",  # Number of initial points
-        dist_max=0.75,  # Max relative distance when create new node
-        dist_min=0.25,  # Min relative distance when create new node
-        dist_decay=0.5,  # decay factor of distance in every level
         clip_periodic=True,  # use periodic boundary when create new node
-        node_uct_improve=0.0,  # C_d  for node
-        node_uct_n_improve=0,  # number of improves
         node_uct_lb_coeff=1.0,  # coefficient for interval lb
         node_uct_box_coeff=1.0,  # coefficient for box size
         node_uct_explore=1.0,  # C_p  for node
-        leaf_improve=100.0,  # C_d'' for leaf
-        leaf_explore=10.0,  # C_p'' for leaf
-        branch_explore=1.0,  # C_p' for branch
         function_variables=None,  # symbolic variables of the function
         function_expression=None,  # symbolic expression of the function
-        suggest_by="root",  # "root" (the root of f==lb) or "box" (within box f==lb)
         seed=None,  # random seed
         **kwargs,
     ):
@@ -136,40 +126,14 @@ class MCIR:
             self.num_node_expand = num_node_expand
 
         # new node position
-        self.dist_max = dist_max  # Max relative distance when create new node
-        self.dist_min = dist_min  # Min relative distance when create new node
-        self.dist_decay = dist_decay  # decay factor of distance in every level
         self.clip_periodic = clip_periodic  # use periodic boundary when create new node
 
         # exploration related
-        self.node_uct_improve = node_uct_improve  # C_d  for node
-        self.node_uct_n_improve = node_uct_n_improve  # number of improves
         self.node_uct_lb_coeff = node_uct_lb_coeff  # coefficient for interval lb
         self.node_uct_box_coeff = node_uct_box_coeff  # coefficient for box size
-
         self.node_uct_explore = node_uct_explore  # C_p  for node
-        self.leaf_improve = leaf_improve  # C_d'' for leaf
-        self.leaf_explore = leaf_explore  # C_p'' for leaf
-        self.branch_explore = branch_explore  # C_d' for branch
-        self.min_node_visit = 1  # minimum number of visits before expand
 
-        # Learning the lower bound
-        self.suggest_failed = False
-        self.lb_function = None
-        self.lb_prime_function = None
-        self.lb_expression = None
-        self.lb_variables = None
-        self.lb_ignore_min_dist = (
-            1e-4  # ignore points with distance smaller than this value
-        )
-        self.lb_lower_by = 0.1  # lower the lower bound by this value
-        self.lb_ignore_coeff = (
-            1e-4  # ignore points with coefficient smaller than this value
-        )
-        self.suggest_by = (
-            suggest_by  # "root" (the root of f==lb) or "box" (within box f==lb)
-        )
-
+        
         # local optimization
         self.local_optimizer = None
         self.n_opt_local = n_opt_local
@@ -346,30 +310,6 @@ class MCIR:
             print(f"  Node {node.children[best].name} is selected")
         return node.children[best]
 
-    # def select_by_uct_interval(self, node):
-    #     ucts = []
-    #     for child in node.children:
-    #         fn_interv = self.node_interval[child.name]
-
-    #         term1 = child.y
-    #         term2 = fn_interv[0]
-    #         term3 = np.sqrt(node.visit) / (1 + child.visit)
-
-    #         uct = (
-    #             -term1 - self.node_uct_lb_coeff * term2 + self.node_uct_explore * term3
-    #         )
-
-    #         if self.verbose >= 3:
-    #             print(
-    #                 f"  Node {child.name} has uct: {uct:.4f} =  - ({term1:.4f}) - {self.node_uct_lb_coeff} * ({term2:.4f}) + {self.node_uct_explore} * ({term3:.4f}) "
-    #             )
-    #         ucts.append(uct)
-
-    #     best = np.argmax(ucts)
-    #     if self.verbose >= 3:
-    #         print(f"  Node {node.children[best].name} is selected")
-    #     return node.children[best]
-
     def split_box_for_children(self, node):
         lb, ub = self.node_bounds[node.name]
         if self.verbose >= 3:
@@ -385,11 +325,6 @@ class MCIR:
             for ii in range(len(node.children)):
                 child = node.children[ii]
                 _x = child.anchor
-
-                # # # To deal with the case when the anchor is outside the box
-                # Option 1: using clipped x within the box
-                # _x = self._clip_point(_x, lb=lb, ub=ub, clip_periodic=False)
-                # cover_set_names.append(child.name)
 
                 # # Option 2: pick only samples within the box
                 if self.point_in_bound(_x, lb, ub):
@@ -424,57 +359,6 @@ class MCIR:
             # update the function interval for valid children
             self.backprop_interval_from_leaf(cover_set[0])
         return
-
-    # def split_box_for_children_with_adding(self, node):
-    #     lb, ub = self.node_bounds[node.name]
-    #     if self.verbose >= 3:
-    #         print(f"Box from node : {node.name} lb = {lb}, ub = {ub}")
-
-    #     # split the box to all children
-    #     if node.children:
-    #         # use index to make sure the order is correct
-    #         xs = []  # valid anchors
-    #         valid_anchor_indices = []
-
-    #         for ii, child in enumerate(node.children):
-    #             _x = child.anchor
-    #             if np.any(_x < lb) or np.any(_x > ub):
-    #                 # invalid anchor; ignore it
-    #                 print(f"Invalide anchor: {_x} for node {child.name}")
-    #                 continue
-    #             valid_anchor_indices.append(ii)
-    #             xs.append(_x)
-
-    #         # randomly add new anchors
-    #         num_new_anchors = len(node.children) - len(valid_anchor_indices)
-    #         if num_new_anchors > 0:
-    #             new_xs = self.advance_sample(num_new_anchors, lb, ub)
-    #             for _x in new_xs:
-    #                 child = self.create_node(_x)
-    #                 child.set_parent(node)
-    #                 child.name = f"{node.name}_{len(node.children)}"
-    #                 self.backprop(child)
-    #                 ii = node.children.index(child)
-    #                 valid_anchor_indices.append(ii)
-    #                 print(f"debug: adding new child {child.name} with index {ii}")
-    #                 xs.append(_x)
-
-    #         xs = np.array(xs)
-
-    #         # split the box; randomly choose a dimension
-    #         split_dim = np.random.randint(0, self.dims)
-    #         boxes = partition_space(lb, ub, xs, split_dim)
-
-    #         if self.verbose >= 3:
-    #             print("splitted box:", boxes)
-
-    #         # update the bounds for all children
-    #         for ii in range(len(valid_anchor_indices)):
-    #             child = node.children[valid_anchor_indices[ii]]
-    #             _lb, _ub = boxes[ii]
-    #             self.assign_box(child, _lb, _ub)
-    #             print(f"debug: adding box for child {child.name}")
-    #     return
 
     def backprop(self, node, x_best=None, y_best=None, iterative=True):
         curr_node = node
@@ -513,10 +397,7 @@ class MCIR:
         return node
 
     def create_empty_node(self):
-        node = RealVectorTreeNode(
-            improve_factor=self.node_uct_improve,
-            improve_count=self.node_uct_n_improve,
-        )
+        node = RealVectorTreeNode()
         return node
 
     def advance_sample(self, num_samples, lb=None, ub=None):
@@ -740,7 +621,6 @@ class MCIR:
         # Exploit the current node for better function value:
         # 1. Create num_node_expand nodes at the next level by random sampling
         # 2. Guess a good point from global Hessian and neighbor gradient
-        # 3. Guess a good point from local Hessian and local gradient
 
         # Step 1: Create num_node_expand nodes at the next level by random sampling
 
@@ -817,41 +697,6 @@ class MCIR:
             )
         if self.verbose >= 3:
             print(f"New node {child.name} is at : ", child.X)
-
-        # # Step 3. Guess a good point from local Hessian and local gradient
-
-        # # Create another new sample by guessing a good point from local fprime and fhess
-        # # using newton's method for convex functions
-        # # using gradient descent for concave functions
-        # anchor = self.guess_good_local(node)
-        # anchor = self._clip_point(anchor)
-
-        # parent = self.root
-        # child = self.create_node(anchor)
-        # child.set_parent(parent)
-        # child.name = parent.name + "_" + f"{len(parent.children)}"
-
-        # # Local optimization
-        # if self.local_optimizer is not None:
-        #     self.node_local_optimize(child)
-        # self.backprop(child)
-
-        # # Assign box for the new node
-        # lb, ub = self.node_bounds[node.name]
-        # dist = 0.5 * (ub - lb)
-        # lb = anchor - dist
-        # ub = anchor + dist
-        # lb = np.clip(lb, self.lb, self.ub)
-        # ub = np.clip(ub, self.lb, self.ub)
-        # self.assign_box(child, lb, ub)
-        # # Evaluate function interval
-        # self.evaluate_node_function_interval(child)
-
-        # if self.verbose >= 2:
-        #     print(
-        #         f"New node {child.name} by optimizing with local Hessian and local gradient: {child.y:.4f} ",
-        #         child.X,
-        #     )
 
         return node.y, node.X
 
