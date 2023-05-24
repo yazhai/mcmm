@@ -1,0 +1,480 @@
+echo 'python run_baseline.py --func Levy --dims 200 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 200 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 200 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 200 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 200 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 200 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 200 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 200 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 200 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 200 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 200 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 200 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 200 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 200 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 200 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 200 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 200 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 200 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 200 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 200 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 200 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 200 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 200 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 200 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 200 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 200 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 200 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 200 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 200 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 200 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 200 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 200 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 200 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 200 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 200 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 200 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 200 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 200 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 200 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 200 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 100 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 100 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 100 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 100 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 100 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 100 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 100 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 100 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 100 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 100 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 100 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 100 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 100 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 100 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 100 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 100 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 100 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 100 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 100 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 100 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 100 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 100 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 100 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 100 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 100 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 100 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 100 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 100 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 100 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 100 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 100 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 100 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 100 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 100 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 100 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 100 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 100 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 100 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 100 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 100 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 50 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 50 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 10 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 10 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 10 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 10 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 10 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 10 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 10 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 10 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 10 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 10 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 10 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 10 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 10 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 10 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 10 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 10 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 10 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 10 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 10 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 10 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 10 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 10 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 10 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 10 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 10 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 10 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 10 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 10 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 10 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 10 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 10 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 10 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 10 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 10 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 10 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 10 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 10 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 10 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Levy --dims 10 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Levy --dims 10 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 200 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 200 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 200 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 200 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 200 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 200 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 200 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 200 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 200 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 200 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 200 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 200 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 200 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 200 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 200 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 200 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 200 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 200 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 200 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 200 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 200 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 200 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 200 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 200 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 200 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 200 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 200 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 200 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 200 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 200 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 200 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 200 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 200 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 200 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 200 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 200 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 200 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 200 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 200 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 200 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 100 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 100 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 100 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 100 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 100 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 100 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 100 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 100 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 100 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 100 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 100 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 100 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 100 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 100 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 100 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 100 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 100 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 100 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 100 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 100 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 100 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 100 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 100 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 100 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 100 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 100 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 100 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 100 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 100 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 100 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 100 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 100 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 100 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 100 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 100 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 100 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 100 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 100 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 100 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 100 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 50 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 50 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 10 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 10 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 10 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 10 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 10 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 10 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 10 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 10 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 10 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 10 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 10 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 10 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 10 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 10 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 10 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 10 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 10 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 10 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 10 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 10 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 10 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 10 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 10 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 10 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 10 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 10 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 10 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 10 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 10 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 10 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 10 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 10 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 10 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 10 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 10 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 10 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 10 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 10 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Ackley --dims 10 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Ackley --dims 10 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 200 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 100 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 50 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo basinhopping --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo differential_evolution --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo simulated_annealing --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo direct --seed 0 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo basinhopping --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo differential_evolution --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo simulated_annealing --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo direct --seed 1 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo basinhopping --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo differential_evolution --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo simulated_annealing --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo direct --seed 2 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo basinhopping --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo differential_evolution --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo simulated_annealing --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo direct --seed 3 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo basinhopping --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo differential_evolution --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo simulated_annealing --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800
+echo 'python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800'
+python run_baseline.py --func Michalewicz --dims 10 --solver scipy --algo direct --seed 4 --output_dir baseline_results_syn_functions/ --displacement -0.61 --timeout 1800

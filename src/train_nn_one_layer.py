@@ -1,3 +1,9 @@
+# Example usage:
+# python train_nn_one_layer.py --input_dims 50 --hidden_dims 16 --num_epochs 10000 --batch_size 8000 --learning_rate 0.001 --num_samples 250000 --test_function ackley --seed 0
+# python train_nn_one_layer.py --input_dims 100 --hidden_dims 16 --num_epochs 20000 --batch_size 8000 --learning_rate 0.001 --num_samples 700000 --test_function ackley --seed 0
+# python train_nn_one_layer.py --input_dims 50 --hidden_dims 16 --num_epochs 10000 --batch_size 8000 --learning_rate 0.001 --num_samples 250000 --test_function michalewicz --seed 0
+# python train_nn_one_layer.py --input_dims 100 --hidden_dims 16 --num_epochs 20000 --batch_size 8000 --learning_rate 0.001 --num_samples 700000 --test_function michalewicz --seed 0
+
 from test_functions import (
     Levy,
     Ackley,
@@ -36,13 +42,6 @@ print()
 print("Running with args:")
 print(args)
 print()
-# Example usage:
-# python train_nn_one_layer.py --input_dims 2 --hidden_dims 16 --num_epochs 1000 --batch_size 1000 --learning_rate 0.001 --num_samples 50000 --test_function ackley --seed 0
-# python train_nn_one_layer.py --input_dims 10 --hidden_dims 16 --num_epochs 5000 --batch_size 1000 --learning_rate 0.001 --num_samples 250000 --test_function ackley --seed 0
-# python train_nn_one_layer.py --input_dims 2 --hidden_dims 16 --num_epochs 1000 --batch_size 1000 --learning_rate 0.001 --num_samples 50000 --test_function michalewicz --seed 0
-# python train_nn_one_layer.py --input_dims 10 --hidden_dims 16 --num_epochs 5000 --batch_size 8000 --learning_rate 0.001 --num_samples 250000 --test_function michalewicz --seed 0
-# python train_nn_one_layer.py --input_dims 2 --hidden_dims 16 --num_epochs 1000 --batch_size 1000 --learning_rate 0.001 --num_samples 50000 --test_function levy --seed 0
-# python train_nn_one_layer.py --input_dims 10 --hidden_dims 16 --num_epochs 5000 --batch_size 5000 --learning_rate 0.001 --num_samples 250000 --test_function levy --seed 0
 
 
 # Set random seeds
@@ -146,9 +145,9 @@ model_info = {
 }
 
 if args.num_epochs == 0 or args.num_samples == 0:
-    nn_filepath = f"nn_models/nn_one_layer_notraining_{args.input_dims}_{args.hidden_dims}.pt"
+    nn_filepath = f"baselines/nn_models/nn_one_layer_notraining_{args.input_dims}_{args.hidden_dims}.pt"
 else:
-    nn_filepath = f"nn_models/nn_one_layer_{args.test_function}_{args.input_dims}_{args.hidden_dims}.pt"
+    nn_filepath = f"baselines/nn_models/nn_one_layer_{args.test_function}_{args.input_dims}_{args.hidden_dims}.pt"
 
 torch.save(
     model_info,
