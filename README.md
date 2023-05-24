@@ -1,6 +1,16 @@
 # Monte Carlo Tree Search with Interval Bounds and Regional Gradient (MCIR)
 
+## Required packages 
+
+Install required packages as from `requirement.txt` via `conda` and `pip`
+
 ## MCIR
+
+MCIR benchmark can be run with command: `python run.py benchmark_settings/xxxx.json`
+
+All source codes are in the `src` directory including test function definitions.
+
+
 
 ## Baselines
 
