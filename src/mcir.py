@@ -4,13 +4,10 @@ from typing import Any
 
 import numpy as np
 
-# import nlopt
-
 from collections import defaultdict
 
 import jax.numpy as jnp
 
-# from jax import device_put, grad, jit, random, vmap
 from jax import grad as jax_grad
 from jax import hessian as jax_hessian
 from jax import jit as jax_jit
@@ -25,7 +22,7 @@ from .helper_ibex import evaluate_function_interval
 from .box_util import partition_space
 
 
-class MCIV:
+class MCIR:
     def __init__(
         self,
         fn,

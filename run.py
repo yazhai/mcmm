@@ -3,10 +3,10 @@ import time, json, fcntl, traceback
 
 
 from src.test_functions import *
-from src.mciv import MCIV
+from src.mcir import MCIR
 
 
-def mciv_test(config_file):
+def mcir_test(config_file):
     # ===========================================================================
     # read the json file
     config = json.loads(open(config_file).read())
@@ -45,7 +45,7 @@ def mciv_test(config_file):
     # ===========================================================================
     # folders for the results
     temp_foler = "temp"
-    save_dir = "./benchmark_mciv/"
+    save_dir = "./benchmark_mcir/"
     os.makedirs(temp_foler, exist_ok=True)
     os.makedirs(save_dir, exist_ok=True)
 
@@ -74,7 +74,7 @@ def mciv_test(config_file):
     if (lb is None) or (ub is None):
         lb, ub = fn.get_default_bounds()
 
-    alg = MCIV(fn, lb, ub, **init_args)
+    alg = MCIR(fn, lb, ub, **init_args)
     dims = alg.dims  # retrieve the dims again
 
     start = time.time()
@@ -170,4 +170,4 @@ def mciv_test(config_file):
 
 if __name__ == "__main__":
     json_file = sys.argv[1]
-    mciv_test(json_file)
+    mcir_test(json_file)
