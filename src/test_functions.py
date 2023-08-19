@@ -17,6 +17,8 @@ except ModuleNotFoundError:
     print("Importing error: Gurobi not found.")
 
 import sys
+import re
+
 
 try:
     from .nlp import *
@@ -36,6 +38,17 @@ def add_cont_var_positive(m: gp.Model, name: str) -> gp.Var:
 def add_cont_var_negative(m: gp.Model, name: str) -> gp.Var:
     return m.addVar(lb=float("-inf"), ub=0, vtype=GRB.CONTINUOUS, name=name)
 
+def convert_to_sympy_expression(expression: str):
+    var_matches = re.findall(r'x\[(\d+)\]', expression)
+    if not var_matches:
+        assert False, "Got an expression with no input variables"
+    
+    num_dimensions = max(map(int, var_matches)) + 1
+
+    x = sympy.symbols('x:{}'.format(num_dimensions))
+
+    sympy_expr = sympy.parsing.sympy_parser.parse_expr(expression.replace('^', '**'), local_dict={'x': x})
+    return x, sympy_expr
 
 class TestFunction:
     def __init__(self, dims: int = 2) -> None:
