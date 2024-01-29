@@ -1,0 +1,33 @@
+python src/run_dreal_baseline.py --func Levy --dim 50 --ub -1 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func Levy --dim 100 --ub -1 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func Levy --dim 200 --ub -1 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func Levy --dim 50 --ub 1 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func Levy --dim 100 --ub 1 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func Levy --dim 200 --ub 1 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func Michalewicz --dim 50 --ub -50 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func Michalewicz --dim 100 --ub -100 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func Michalewicz --dim 200 --ub -201 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func Michalewicz --dim 50 --ub -49 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func Michalewicz --dim 100 --ub -99 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func Michalewicz --dim 200 --ub -198 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func Ackley --dim 50 --ub -1 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func Ackley --dim 100 --ub -1 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func Ackley --dim 200 --ub -1 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func Ackley --dim 50 --ub 1 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func Ackley --dim 100 --ub 1 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func Ackley --dim 200 --ub 1 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func Watson --dim 32 --ub 0 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func Harkerp --dim 101 --ub -1 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func Biggsbi1 --dim 1001 --ub 0 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func Watson --dim 32 --ub 1 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func Harkerp --dim 101 --ub 0 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func Biggsbi1 --dim 1001 --ub 1 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func nn --dim 50 --nn_path src/nn_models/nn_one_layer_michalewicz_50_16.pt --ub -15 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func nn --dim 100 --nn_path src/nn_models/nn_one_layer_michalewicz_100_16.pt --ub -20 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func nn --dim 50 --nn_path src/nn_models/nn_one_layer_michalewicz_50_16.pt --ub -5 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func nn --dim 100 --nn_path src/nn_models/nn_one_layer_michalewicz_100_16.pt --ub -15 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func nn --dim 50 --nn_path src/nn_models/nn_one_layer_ackley_50_16.pt --ub 15 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func nn --dim 100 --nn_path src/nn_models/nn_one_layer_ackley_100_16.pt --ub 15 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func nn --dim 50 --nn_path src/nn_models/nn_one_layer_ackley_50_16.pt --ub 25 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+python src/run_dreal_baseline.py --func nn --dim 100 --nn_path src/nn_models/nn_one_layer_ackley_100_16.pt --ub 25 --binary /opt/dreal/4.21.06.2/bin/dreal --timeout 600
+
